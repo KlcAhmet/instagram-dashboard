@@ -7,7 +7,8 @@ module.exports = {
       colors: {
         transparent: "transparent",
         white: "#ffffff",
-        black: "#000000"
+        black: "#000000",
+        gray: "#323231"
       }
     }
   },
