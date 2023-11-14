@@ -25,7 +25,7 @@ export const getStyle: PlasmoGetStyle = () => {
 export const getOverlayAnchor: PlasmoGetOverlayAnchor = async () =>
   document.querySelector("body")
 
-export const getShadowHostId = () => "inline-anchor"
+export const getShadowHostId = () => "plasmo-anchor"
 
 const PlasmoOverlay: FC = () => {
   return <IndexPage />
