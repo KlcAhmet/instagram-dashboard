@@ -1,14 +1,26 @@
-import { StrictMode } from "react"
+import { StrictMode, useState } from "react"
 
+import { FollowList } from "~components/follow-list"
 import { Profile } from "~components/profile"
-import config from "~config.json"
 
 function IndexPage() {
-  const { homePageProfile } = config.htmlClass
+  const [activeProfile, setActiveProfile] = useState(false)
+  const [activeFollowList, setActiveFollowList] = useState(false)
 
   return (
     <StrictMode>
-      <Profile />
+      <div className="absolute md:pr-10 inline bg-gray p-1">
+        <div>
+          <button onClick={() => setActiveProfile(!activeProfile)}>
+            {activeProfile ? "close profile" : "open profile"}
+          </button>
+          <button onClick={() => setActiveFollowList(!activeFollowList)}>
+            {activeFollowList ? "close follow list" : "open follow list"}
+          </button>
+        </div>
+        {activeProfile ? <Profile /> : null}
+        {activeFollowList ? <FollowList /> : null}
+      </div>
     </StrictMode>
   )
 }
