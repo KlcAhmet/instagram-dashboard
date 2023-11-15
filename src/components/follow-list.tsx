@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
+import { type TUserList } from "src/types"
 
-import dumpData from "~dumpData.json"
-import { type TUserList } from "~models"
+import { getFollowerList } from "~api"
 
 
 
@@ -9,17 +9,18 @@ import { type TUserList } from "~models"
 
 export function FollowList() {
   const [userList, setUserList] = useState(Array<TUserList>)
-  const [maxID, setMaxID] = useState("")
+  const [maxId, setMaxId] = useState("")
 
   useEffect(() => {
-    const db = dumpData["follow-first"]
-    setUserList(db.users)
-    setMaxID(db.next_max_id)
-    /*getFollowerList().then((data) => {
-      setUserList(data.users)
-      setMaxID(data.next_max_id)
-    })*/
-  }, [])
+    getFollowerList(maxId).then((data) => {
+      setUserList([...userList, ...data.users])
+      if (data?.next_max_id) {
+        setTimeout(() => {
+          setMaxId(data.next_max_id)
+        }, 3000)
+      }
+    })
+  }, [maxId])
 
   return (
     <>

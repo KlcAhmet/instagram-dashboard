@@ -1,11 +1,13 @@
-export function getAllCookies(): {} {
-  const cookies = document.cookie // Tüm cookie'leri bir string olarak al
+import { type TCookie } from "src/types"
+
+export function getAllCookies(): TCookie {
+  const cookies = document.cookie
 
   if (cookies === "") {
-    return {} // Eğer herhangi bir cookie yoksa boş bir obje döndür
+    return { csrftoken: "", dpr: "", ds_user_id: "", ig_nrcb: "", mid: "" }
   }
 
-  const cookieArray = cookies.split(";") // Cookie'leri ayır
+  const cookieArray = cookies.split(";")
   const cookieObject = {}
 
   for (const cookie of cookieArray) {
@@ -14,5 +16,14 @@ export function getAllCookies(): {} {
     cookieObject[name] = value // Ad ve değeri objeye ekle
   }
 
-  return cookieObject
+  return <TCookie>cookieObject
+}
+
+export function serializeCookie(obj: {} | TCookie): string {
+  return Object.entries(obj)
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
+    )
+    .join("; ")
 }
