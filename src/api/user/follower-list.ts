@@ -8,8 +8,8 @@ import { getAllCookies } from "~helpers"
 
 
 export async function getFollowerList(maxId: string): Promise<TFollowersList> {
-  let headers = new Headers()
   const cookies = getAllCookies()
+  let headers = new Headers()
 
   headers.append("x-csrftoken", cookies?.csrftoken)
   headers.append("x-ig-app-id", config.requestHeaders["x-ig-app-id"])
