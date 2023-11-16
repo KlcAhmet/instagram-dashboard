@@ -1,5 +1,6 @@
 import { type TUserProfile } from "src/types"
 
+import { FollowList } from "~components/follow-list"
 import { useAppSelector } from "~store"
 
 
@@ -28,6 +29,9 @@ export function Profile() {
                 <p>Takip: {user["edge_follow.count"]}</p>
               </div>
             </div>
+          </div>
+          <div>
+            <FollowList />
           </div>
         </div>
       ) : null}

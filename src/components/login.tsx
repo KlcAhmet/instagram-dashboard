@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 
 
 import { getUserProfile } from '~api';
-import { indexedDBName } from '~config.json';
+import { Loading } from '~components/loading';
 import { getAllCookies } from '~helpers';
+import { getUsersIndexedDB, setUserIndexedDB } from '~indexedDB';
 import { useAppDispatch, useAppSelector } from '~store';
 import { setUser, type TUserState } from '~store/userSlice';
 
@@ -17,41 +18,19 @@ export function Login() {
   const dispatch = useAppDispatch()
   const user: TUserState = useAppSelector((state) => state.user)
   const cookieStore = getAllCookies()
-  const [username, setUsername] = useState("wrappiezone")
+  const [username, setUsername] = useState("")
+  const [usersIndexedDB, setUsersIndexedDB] = useState([]) as any[]
 
   useEffect(() => {
-    let openRequest = window.indexedDB.open(indexedDBName, 1)
-
-    openRequest.onupgradeneeded = function () {
-      let db = openRequest.result
-      if (!db.objectStoreNames.contains(indexedDBName))
-        db.createObjectStore(indexedDBName, { keyPath: "ds_user_id" })
-    }
-
-    openRequest.onerror = function () {
-      console.error("DB Error", openRequest.error)
-    }
-
-    openRequest.onsuccess = function () {
-      const db = openRequest.result
-      const transaction = db.transaction(indexedDBName, "readwrite")
-      const store = transaction.objectStore(indexedDBName)
-      const getAllRequest = store.getAll()
-
-      getAllRequest.onsuccess = () => {
-        const allData = getAllRequest.result
-        console.log("DB onsuccess:", allData)
-      }
-
-      getAllRequest.onerror = function () {
-        console.error("DB Error", getAllRequest.error)
-      }
-    }
+    getUsersIndexedDB().then((db) => {
+      setUsersIndexedDB(db)
+    })
   }, [])
 
   function getUser() {
     getUserProfile(username).then((user) => {
       if (user.id === cookieStore.ds_user_id) {
+        setUserIndexedDB(user)
         dispatch(setUser(user))
       }
     })
@@ -60,18 +39,57 @@ export function Login() {
   return (
     <>
       {!user.id ? (
-        <div>
-          <label>Username: </label>
-          <input
-            type="text"
-            name="username"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <button type="button" onClick={getUser}>
-            Get User
-          </button>
+        <div className="space-y-3">
+          <div>
+            <Suspense fallback={<Loading />}>
+              <UserList users={usersIndexedDB} cookieStore={cookieStore} />
+            </Suspense>
+          </div>
+          <div>
+            <label>Username: </label>
+            <input
+              type="text"
+              name="username"
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <button type="button" onClick={getUser}>
+              Get User
+            </button>
+          </div>
         </div>
       ) : null}
     </>
+  )
+}
+
+function UserList({ users, cookieStore }) {
+  const dispatch = useAppDispatch()
+
+  function getUserById(user: { username: string }) {
+    getUserProfile(user.username).then((user) => {
+      if (user.id === cookieStore.ds_user_id) {
+        dispatch(setUser(user))
+      }
+    })
+  }
+
+  return (
+    <div>
+      {users.map((user) => (
+        <button
+          key={user.id}
+          type="button"
+          onClick={() => getUserById(user)}
+          className="flex flex-row flex-nowrap items-center">
+          <img
+            src={user.profile_pic_url}
+            className="rounded-full w-10 h-10 mr-5"
+            alt="profile"
+            loading="lazy"
+          />
+          <span>{user.username}</span>
+        </button>
+      ))}
+    </div>
   )
 }

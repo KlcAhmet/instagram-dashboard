@@ -1,24 +1,17 @@
-import { StrictMode, useState } from 'react';
-import { Provider } from 'react-redux';
+import { StrictMode, useState } from "react"
+import { Provider } from "react-redux"
 
+import "~indexedDB"
 
+import { PersistGate } from "@plasmohq/redux-persist/integration/react"
 
-import { PersistGate } from '@plasmohq/redux-persist/integration/react';
+import { Login } from "~components/login"
+import { Profile } from "~components/profile"
+import { index, persistor } from "~store"
 
+import Icon from "../../assets/icon.png"
+import XIcon from "../appassets/XIcon.png"
 
-
-import { FollowList } from '~components/follow-list';
-import { Login } from '~components/login';
-import { Profile } from '~components/profile';
-import { index, persistor } from '~store';
-
-
-
-import Icon from '../../assets/icon.png';
-import XIcon from '../appassets/XIcon.png';
-
-
-//  db.close();
 
 function IndexPage() {
   const [activeProfile, setActiveProfile] = useState(false)
@@ -40,10 +33,9 @@ function IndexPage() {
               </button>
             </div>
             {activeProfile ? (
-              <div className="w-96 max-h-[80vh] overflow-y-scroll">
+              <div className="min-w-[400px] max-h-[80vh] overflow-y-scroll">
                 <Login />
                 <Profile />
-                <FollowList />
               </div>
             ) : null}
           </div>
