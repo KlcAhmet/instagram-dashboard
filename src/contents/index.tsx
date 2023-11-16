@@ -1,4 +1,4 @@
-import styleText from "data-text:~assets/global.css"
+import styleText from "data-text:~appassets/global.css"
 import type {
   PlasmoCSConfig,
   PlasmoGetOverlayAnchor,
@@ -7,6 +7,8 @@ import type {
 import { type FC } from "react"
 
 import IndexPage from "~pages/index"
+
+import "~background"
 
 
 

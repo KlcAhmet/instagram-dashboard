@@ -13,7 +13,7 @@ export function getAllCookies(): TCookie {
   for (const cookie of cookieArray) {
     const [name, value] = cookie.split("=").map((part) => part.trim()) // Her bir cookie'yi ad ve değer olarak ayır
     // @ts-ignore
-    cookieObject[name] = value // Ad ve değeri objeye ekle
+    cookieObject[name] = value
   }
 
   return <TCookie>cookieObject
