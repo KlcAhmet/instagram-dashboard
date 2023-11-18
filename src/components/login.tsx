@@ -30,6 +30,7 @@ export function Login() {
   function getUser() {
     getUserProfile(username).then((user) => {
       if (user.id === cookieStore.ds_user_id) {
+        console.log("getUserProfile", user)
         setUserIndexedDB(user)
         dispatch(setUser(user))
       }
@@ -65,8 +66,8 @@ export function Login() {
 function UserList({ users, cookieStore }) {
   const dispatch = useAppDispatch()
 
-  function getUserById(user: { username: string }) {
-    getUserProfile(user.username).then((user) => {
+  function getUserByUsername(username: string) {
+    getUserProfile(username).then((user) => {
       if (user.id === cookieStore.ds_user_id) {
         dispatch(setUser(user))
       }
@@ -79,7 +80,7 @@ function UserList({ users, cookieStore }) {
         <button
           key={user.id}
           type="button"
-          onClick={() => getUserById(user)}
+          onClick={() => getUserByUsername(user.username)}
           className="flex flex-row flex-nowrap items-center">
           <img
             src={user.profile_pic_url}

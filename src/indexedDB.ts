@@ -16,7 +16,7 @@ openRequest.onerror = function () {
   console.error("DB Error", openRequest.error)
 }
 
-export async function getUsersIndexedDB() {
+export async function getUsersIndexedDB(): Promise<any> {
   let response = new Promise((resolve, reject) => {
     const db = openRequest.result
     const transaction = db.transaction(indexedDBName, "readwrite")
@@ -44,11 +44,34 @@ export async function setUserIndexedDB(data: any) {
     const request = users.add({
       ...data,
       ds_user_id: data.id,
-      created_at: new Date()
+      created_at: new Date().toISOString()
     })
 
     request.onsuccess = function () {
-      // (4)
+      console.log("User added to the store", request.result)
+      resolve(request.result)
+    }
+
+    request.onerror = function () {
+      console.log("Error", request.error)
+      reject(request.error)
+    }
+  })
+  return await response
+}
+
+export async function updateUserIndexedDB(data: any) {
+  let response = new Promise((resolve, reject) => {
+    const db = openRequest.result
+    const transaction = db.transaction(indexedDBName, "readwrite")
+    let users = transaction.objectStore(indexedDBName)
+    const request = users.put({
+      ...data,
+      ds_user_id: data.id,
+      updated_at: new Date().toISOString()
+    })
+
+    request.onsuccess = function () {
       console.log("User added to the store", request.result)
       resolve(request.result)
     }

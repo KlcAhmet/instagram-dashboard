@@ -21,6 +21,7 @@ const userSlice = createSlice({
     username: "",
     ds_user_id: "",
     followers: {
+      status_execute: "idle",
       next_max_id: "",
       users: []
     }
@@ -39,9 +40,27 @@ const userSlice = createSlice({
         ...state,
         username: action.payload
       }
+    },
+    setFollowers: (state, action) => {
+      console.log("setFollowers action.payload", action.payload)
+      return {
+        ...state,
+        followers: action.payload
+      }
+    },
+    setFollowersStatusExecute: (state, action) => {
+      console.log("setFollowersStatusExecute action.payload", action.payload)
+      return {
+        ...state,
+        followers: {
+          ...state.followers,
+          status_execute: action.payload
+        }
+      }
     }
   }
 })
-export const { setUser, setUsername } = userSlice.actions
+export const { setUser, setUsername, setFollowers, setFollowersStatusExecute } =
+  userSlice.actions
 
 export default userSlice.reducer

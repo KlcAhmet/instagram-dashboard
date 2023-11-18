@@ -1,4 +1,5 @@
 export type TFollowersList = {
+  status_execute: TStatusExecute
   next_max_id?: string
   users: Array<TUserList>
 }
@@ -16,3 +17,10 @@ export type TUserList = {
   profile_pic_id: string
   profile_pic_url: string
 }
+
+export type TStatusExecute =
+  | "idle"
+  | "running"
+  | "pending"
+  | "finished"
+  | "error"
