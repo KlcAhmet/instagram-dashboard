@@ -2,6 +2,10 @@ export type TFollowersList = {
   status_execute: TStatusExecute
   next_max_id?: string
   users: Array<TUserList>
+  last_user_logs: Array<{
+    users: Array<TUserList>
+    created_at: string
+  }>
 }
 
 export type TUserList = {

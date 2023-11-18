@@ -23,7 +23,8 @@ const userSlice = createSlice({
     followers: {
       status_execute: "idle",
       next_max_id: "",
-      users: []
+      users: [],
+      last_user_logs: []
     }
   },
   reducers: {

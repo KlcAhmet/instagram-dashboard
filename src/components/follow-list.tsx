@@ -16,9 +16,7 @@ export function FollowList() {
   const dispatch = useAppDispatch()
   const [activeFollowList, setActiveFollowList] = useState(false)
   const user: TUserState = useAppSelector((state) => state.user)
-  const count = useMemo(() => {
-    return user["edge_followed_by.count"]
-  }, [user["edge_followed_by.count"]])
+
   const maxId = useMemo(() => {
     return user.followers.next_max_id
   }, [user.followers.next_max_id])
@@ -29,9 +27,9 @@ export function FollowList() {
     return user.followers.status_execute
   }, [user.followers.status_execute])
 
-  const percentile = useMemo(() => {
-    return (100 * (users.length / count)).toFixed(0)
-  }, [users])
+  /*const lastUserLogs = useMemo(() => {
+    return user.followers.last_user_logs
+  }, [user.followers.last_user_logs])*/
 
   function init() {
     setTimeout(() => {
@@ -39,6 +37,7 @@ export function FollowList() {
         console.log(data)
         dispatch(
           setFollowers({
+            ...user.followers,
             status_execute: "running",
             ...data,
             users: [...user.followers.users, ...data.users]
@@ -50,6 +49,34 @@ export function FollowList() {
 
   function updateFollowersStatusExecute(status: TStatusExecute) {
     dispatch(setFollowersStatusExecute(status))
+  }
+
+  function saveFollowers() {
+    updateUserIndexedDB({
+      ...user,
+      followers: {
+        ...user.followers,
+        last_user_logs: [
+          {
+            users: user.followers.users,
+            created_at: new Date().toISOString()
+          },
+          ...(user.followers.last_user_logs ?? undefined)
+        ]
+      }
+    })
+    dispatch(
+      setFollowers({
+        ...user.followers,
+        last_user_logs: [
+          {
+            users: user.followers.users,
+            created_at: new Date().toISOString()
+          },
+          ...user.followers.last_user_logs
+        ]
+      })
+    )
   }
 
   useEffect(() => {
@@ -85,14 +112,30 @@ export function FollowList() {
           </div>
           <StatusBar
             activeFollowList={activeFollowList}
-            count={count}
-            usersLength={users.length}
-            percentile={percentile}
+            statusExecute={statusExecute}
+            count={users.length}
           />
         </button>
       </div>
       {activeFollowList ? (
         <div className="w-80">
+          <button type={"button"} onClick={saveFollowers} className="ml-2">
+            kaydet
+          </button>
+          <button
+            type={"button"}
+            onClick={() => {
+              dispatch(
+                setFollowers({
+                  ...user.followers,
+                  users: []
+                })
+              )
+              updateFollowersStatusExecute("idle")
+            }}
+            className="ml-2">
+            yenile
+          </button>
           {users.map((user) => (
             <div key={user.pk} className="flex flex-nowrap items-center">
               <div>
@@ -122,21 +165,20 @@ export function FollowList() {
   )
 }
 
-function StatusBar({ count, percentile, usersLength, activeFollowList }) {
-  useEffect(() => {
-    console.log("usersLength", usersLength)
-  }, [usersLength])
+function StatusBar({ statusExecute, activeFollowList, count }) {
   return (
     <div>
       {activeFollowList ? (
         <div>
           <p>
-            {usersLength} / {count}
+            status {statusExecute} : {count}
           </p>
         </div>
       ) : (
         <div>
-          <p>%{percentile}</p>
+          <p>
+            {statusExecute} : {count}
+          </p>
         </div>
       )}
     </div>

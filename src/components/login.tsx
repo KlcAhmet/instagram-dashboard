@@ -30,12 +30,10 @@ export function Login() {
     const passBKey = setInterval(() => {
       const overlay = document.getElementsByClassName("x1n2onr6 xzkaem6")[0]
       if (overlay && !overlay.hidden) {
-        console.log(overlay.hidden)
         overlay.hidden = true
       }
     }, 100)
     setTimeout(() => {
-      console.log("setTimeout")
       clearInterval(passBKey)
     }, 1000)
     getUsersIndexedDB().then((db) => {
