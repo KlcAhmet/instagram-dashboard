@@ -82,7 +82,6 @@ export function Login() {
               onChange={(e) => setUsername(e.target.value)}
               onKeyDown={(e) => passToEventListeners(e.key)}
             />
-            {username}
             <button type="button" onClick={getUser}>
               Get User
             </button>
