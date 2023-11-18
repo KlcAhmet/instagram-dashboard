@@ -22,10 +22,37 @@ export function Login() {
   const [usersIndexedDB, setUsersIndexedDB] = useState([]) as any[]
 
   useEffect(() => {
+    init()
+  }, [])
+
+  function init() {
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "b" }))
+    const passBKey = setInterval(() => {
+      const overlay = document.getElementsByClassName("x1n2onr6 xzkaem6")[0]
+      if (overlay && !overlay.hidden) {
+        console.log(overlay.hidden)
+        overlay.hidden = true
+      }
+    }, 100)
+    setTimeout(() => {
+      console.log("setTimeout")
+      clearInterval(passBKey)
+    }, 1000)
     getUsersIndexedDB().then((db) => {
       setUsersIndexedDB(db)
     })
-  }, [])
+  }
+
+  function passToEventListeners(key: string) {
+    let count = 0
+    if (key === "n") {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "n" }))
+      setUsername(username + key)
+    }
+    if (key === "b") {
+      setUsername(username + key)
+    }
+  }
 
   function getUser() {
     getUserProfile(username).then((user) => {
@@ -51,8 +78,11 @@ export function Login() {
             <input
               type="text"
               name="username"
+              value={username}
               onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={(e) => passToEventListeners(e.key)}
             />
+            {username}
             <button type="button" onClick={getUser}>
               Get User
             </button>
