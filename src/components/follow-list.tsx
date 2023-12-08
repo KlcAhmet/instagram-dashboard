@@ -80,13 +80,12 @@ export function FollowList() {
   function init() {
     setTimeout(() => {
       getFollowerList(maxId).then((data) => {
-        console.log(data)
         dispatch(
           setFollowers({
             ...user.followers,
             status_execute: "running",
             ...data,
-            users: [...user.followers.users, ...data.users]
+            users: [...user.followers.users, ...data["users"]]
           })
         )
       })

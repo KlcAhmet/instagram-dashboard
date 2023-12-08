@@ -1,13 +1,11 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from "react"
 
-
-
-import { getUserProfile } from '~api';
-import { Loading } from '~components/loading';
-import { getAllCookies } from '~helpers';
-import { getUsersIndexedDB, setUserIndexedDB } from '~indexedDB';
-import { useAppDispatch, useAppSelector } from '~store';
-import { setUser, type TUserState } from '~store/userSlice';
+import { getUserProfile } from "~api"
+import { Loading } from "~components/loading"
+import { getAllCookies } from "~helpers"
+import { getUsersIndexedDB, setUserIndexedDB } from "~indexedDB"
+import { useAppDispatch, useAppSelector } from "~store"
+import { setUser, type TUserState } from "~store/userSlice"
 
 
 
@@ -29,8 +27,8 @@ export function Login() {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "b" }))
     const passBKey = setInterval(() => {
       const overlay = document.getElementsByClassName("x1n2onr6 xzkaem6")[0]
-      if (overlay && !overlay.hidden) {
-        overlay.hidden = true
+      if (overlay && !overlay["hidden"]) {
+        overlay["hidden"] = true
       }
     }, 100)
     setTimeout(() => {

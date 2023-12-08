@@ -1,4 +1,4 @@
-import type { TFollowersList } from "src/types"
+import type { TFollowersList, TUserList } from "src/types"
 
 import config from "~config.json"
 import { getAllCookies } from "~helpers"
@@ -7,7 +7,9 @@ import { getAllCookies } from "~helpers"
 
 
 
-export async function getFollowerList(maxId: string): Promise<TFollowersList> {
+export async function getFollowerList(
+  maxId: string
+): Promise<TFollowersList | {}> {
   const cookies = getAllCookies()
   let headers = new Headers()
 
@@ -30,7 +32,10 @@ export async function getFollowerList(maxId: string): Promise<TFollowersList> {
     .then((result) => result)
     .catch((error) => console.log("error", error))
 
-  const { next_max_id, users } = await response
+  const {
+    next_max_id,
+    users
+  }: { next_max_id: string; users: Array<TUserList> } = await response
 
   return {
     next_max_id: next_max_id,
