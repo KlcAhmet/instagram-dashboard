@@ -8,9 +8,53 @@ import {
   setFollowersStatusExecute,
   type TUserState
 } from "~store/userSlice"
-import type { TStatusExecute } from "~types"
+import type { TFollowed, TStatusExecute, TUserList } from "~types"
 
 import followersIcon from "../appassets/followers.png"
+
+function ComparisonList({ list }) {
+  return (
+    <div>
+      {/*      <div>
+        <button
+          type="button"
+          className="ml-2 border-2 border-blue-500"
+          onClick={() => {
+            dispatch(
+              setFollowers({
+                ...user.followers,
+                unfollowed: []
+              })
+            )
+          }}>
+          listeyi temizle
+        </button>
+      </div>*/}
+      {list.map((item) => (
+        <div
+          key={`${item.user.pk}-${new Date(item.created_at)}`}
+          className={
+            "flex flex-nowrap items-center mb-1 " +
+            (item.status === "unfollowed" ? "bg-red-700" : "bg-green-700")
+          }>
+          <div>
+            {/*<img
+                  className="rounded-full w-14"
+                  src={user.profile_pic_url}
+                  alt="userimg"
+                  loading="lazy"
+                />*/}
+          </div>
+          <div className="flex flex-col flex-grow ml-2">
+            <p className="">{item.user.username}</p>
+            <p className="">{item.status}</p>
+            <p className="">{`${new Date(item.created_at)}`}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export function FollowList() {
   const dispatch = useAppDispatch()
@@ -26,10 +70,12 @@ export function FollowList() {
   const statusExecute = useMemo(() => {
     return user.followers.status_execute
   }, [user.followers.status_execute])
-
-  /*const lastUserLogs = useMemo(() => {
-    return user.followers.last_user_logs
-  }, [user.followers.last_user_logs])*/
+  const lastUserLogs = useMemo(() => {
+    return user.followers.last_user_log.users
+  }, [user.followers.last_user_log.users])
+  const unFollowed: Array<TFollowed> = useMemo(() => {
+    return user.followers.unfollowed
+  }, [user.followers.unfollowed])
 
   function init() {
     setTimeout(() => {
@@ -51,32 +97,22 @@ export function FollowList() {
     dispatch(setFollowersStatusExecute(status))
   }
 
-  function saveFollowers() {
-    updateUserIndexedDB({
-      ...user,
-      followers: {
-        ...user.followers,
-        last_user_logs: [
-          {
-            users: user.followers.users,
-            created_at: new Date().toISOString()
-          },
-          ...(user.followers.last_user_logs ?? undefined)
-        ]
-      }
+  function findUnFollowedUsers(): Array<TFollowed> {
+    const unfollowedUsers = lastUserLogs.filter((user) => {
+      return !users.find((u) => u.pk === user.pk)
     })
-    dispatch(
-      setFollowers({
-        ...user.followers,
-        last_user_logs: [
-          {
-            users: user.followers.users,
-            created_at: new Date().toISOString()
-          },
-          ...user.followers.last_user_logs
-        ]
+    const mappedUnfollowedUsers = unfollowedUsers
+      .map((user: TUserList) => {
+        return {
+          user,
+          status: "unfollowed",
+          created_at: new Date().toISOString()
+        }
       })
-    )
+      .filter((user) => user !== null)
+    mappedUnfollowedUsers.push(...unFollowed)
+
+    return mappedUnfollowedUsers
   }
 
   useEffect(() => {
@@ -86,10 +122,26 @@ export function FollowList() {
       init()
     } else if (!maxId && statusExecute === "running") {
       updateFollowersStatusExecute("finished")
+      dispatch(
+        setFollowers({
+          ...user.followers,
+          last_user_log: {
+            users: user.followers.users,
+            created_at: new Date().toISOString()
+          },
+          unfollowed: findUnFollowedUsers(),
+          status_execute: "finished"
+        })
+      )
       updateUserIndexedDB({
         ...user,
         followers: {
           ...user.followers,
+          last_user_log: {
+            users: user.followers.users,
+            created_at: new Date().toISOString()
+          },
+          unfollowed: findUnFollowedUsers(),
           status_execute: "finished"
         }
       })
@@ -118,12 +170,10 @@ export function FollowList() {
         </button>
       </div>
       {activeFollowList ? (
-        <div className="w-80">
-          <button type={"button"} onClick={saveFollowers} className="ml-2">
-            kaydet
-          </button>
+        <div>
           <button
-            type={"button"}
+            type="button"
+            className="ml-2 border-2 border-blue-500"
             onClick={() => {
               dispatch(
                 setFollowers({
@@ -132,33 +182,41 @@ export function FollowList() {
                 })
               )
               updateFollowersStatusExecute("idle")
-            }}
-            className="ml-2">
+            }}>
             yenile
           </button>
-          {users.map((user) => (
-            <div key={user.pk} className="flex flex-nowrap items-center">
-              <div>
-                {/*<img
+          <div className="flex flex-nowrap">
+            <div>
+              {users.map((user) => (
+                <div key={user.pk} className="flex flex-nowrap items-center">
+                  <div>
+                    {/*<img
                   className="rounded-full w-14"
                   src={user.profile_pic_url}
                   alt="userimg"
                   loading="lazy"
                 />*/}
-              </div>
-              <div className="flex flex-col flex-grow ml-2">
-                <p className="">{user.username}</p>
-                <div>
-                  <button type="button" className="ml-auto border p-2">
-                    Çıkart
-                  </button>
-                  <button type="button" className="ml-auto border p-2">
-                    ---
-                  </button>
+                  </div>
+                  <div className="flex flex-col flex-grow ml-2">
+                    <p className="">{user.username}</p>
+                    <div>
+                      <button
+                        type="button"
+                        className="ml-auto border-2 border-blue-500 p-2">
+                        Çıkart
+                      </button>
+                      <button
+                        type="button"
+                        className="ml-auto border-2 bborder-blue-500 p-2">
+                        ---
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
-          ))}
+            <ComparisonList list={unFollowed} />
+          </div>
         </div>
       ) : null}
     </div>
