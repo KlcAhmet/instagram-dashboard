@@ -1,11 +1,19 @@
+export type TFollowed = {
+  user: TUserList
+  status: string | "unfollowed" | "followed"
+  created_at: string
+}
+
 export type TFollowersList = {
   status_execute: TStatusExecute
   next_max_id?: string
   users: Array<TUserList>
-  last_user_logs: Array<{
-    users: Array<TUserList>
+  last_user_log: {
     created_at: string
-  }>
+    users: Array<TUserList>
+  }
+  unfollowed: Array<TFollowed>
+  followed: Array<TFollowed>
 }
 
 export type TUserList = {

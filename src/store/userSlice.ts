@@ -24,7 +24,9 @@ const userSlice = createSlice({
       status_execute: "idle",
       next_max_id: "",
       users: [],
-      last_user_logs: []
+      last_user_log: { created_at: "", users: [] },
+      unfollowed: [],
+      followed: []
     }
   },
   reducers: {
@@ -58,10 +60,25 @@ const userSlice = createSlice({
           status_execute: action.payload
         }
       }
+    },
+    setFollowersUnfollowed: (state, action) => {
+      console.log("setFollowersStatusExecute action.payload", action.payload)
+      return {
+        ...state,
+        followers: {
+          ...state.followers,
+          unfollowed: action.payload
+        }
+      }
     }
   }
 })
-export const { setUser, setUsername, setFollowers, setFollowersStatusExecute } =
-  userSlice.actions
+export const {
+  setUser,
+  setFollowersUnfollowed,
+  setUsername,
+  setFollowers,
+  setFollowersStatusExecute
+} = userSlice.actions
 
 export default userSlice.reducer
