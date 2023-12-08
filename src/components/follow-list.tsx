@@ -12,9 +12,9 @@ import type { TFollowed, TStatusExecute, TUserList } from "~types"
 
 import followersIcon from "../appassets/followers.png"
 
-function ComparisonList({ list }) {
+function ComparisonList({ unFollowed, followed }) {
   return (
-    <div>
+    <div className="flex flex-col">
       {/*      <div>
         <button
           type="button"
@@ -30,28 +30,54 @@ function ComparisonList({ list }) {
           listeyi temizle
         </button>
       </div>*/}
-      {list.map((item) => (
-        <div
-          key={`${item.user.pk}-${new Date(item.created_at)}`}
-          className={
-            "flex flex-nowrap items-center mb-1 " +
-            (item.status === "unfollowed" ? "bg-red-700" : "bg-green-700")
-          }>
-          <div>
-            {/*<img
+      <div className="max-h-80 overflow-y-scroll">
+        {unFollowed.map((item) => (
+          <div
+            key={`${item.user.pk}-${new Date(item.created_at)}`}
+            className={
+              "flex flex-nowrap items-center mb-1 " +
+              (item.status === "unfollowed" ? "bg-red-700" : "bg-green-700")
+            }>
+            <div>
+              {/*<img
                   className="rounded-full w-14"
                   src={user.profile_pic_url}
                   alt="userimg"
                   loading="lazy"
                 />*/}
+            </div>
+            <div className="flex flex-col flex-grow ml-2">
+              <p className="">{item.user.username}</p>
+              <p className="">{item.status}</p>
+              <p className="">{`${new Date(item.created_at)}`}</p>
+            </div>
           </div>
-          <div className="flex flex-col flex-grow ml-2">
-            <p className="">{item.user.username}</p>
-            <p className="">{item.status}</p>
-            <p className="">{`${new Date(item.created_at)}`}</p>
+        ))}
+      </div>
+      <div className="max-h-80 overflow-y-scroll">
+        {followed.map((item) => (
+          <div
+            key={`${item.user.pk}-${new Date(item.created_at)}`}
+            className={
+              "flex flex-nowrap items-center mb-1 " +
+              (item.status === "unfollowed" ? "bg-red-700" : "bg-green-700")
+            }>
+            <div>
+              {/*<img
+                  className="rounded-full w-14"
+                  src={user.profile_pic_url}
+                  alt="userimg"
+                  loading="lazy"
+                />*/}
+            </div>
+            <div className="flex flex-col flex-grow ml-2">
+              <p className="">{item.user.username}</p>
+              <p className="">{item.status}</p>
+              <p className="">{`${new Date(item.created_at)}`}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }
@@ -76,6 +102,9 @@ export function FollowList() {
   const unFollowed: Array<TFollowed> = useMemo(() => {
     return user.followers.unfollowed
   }, [user.followers.unfollowed])
+  const followed: Array<TFollowed> = useMemo(() => {
+    return user.followers.followed
+  }, [user.followers.followed])
 
   function init() {
     setTimeout(() => {
@@ -114,6 +143,25 @@ export function FollowList() {
     return mappedUnfollowedUsers
   }
 
+  function findFollowedUsers(): Array<TFollowed> {
+    const followedUsers = users.filter((user) => {
+      return !lastUserLogs.find((u) => u.pk === user.pk)
+    })
+
+    const mappedFollowedUsers = followedUsers
+      .map((user: TUserList) => {
+        return {
+          user,
+          status: "followed",
+          created_at: new Date().toISOString()
+        }
+      })
+      .filter((user) => user !== null)
+    mappedFollowedUsers.push(...followed)
+    console.log(mappedFollowedUsers)
+    return mappedFollowedUsers
+  }
+
   useEffect(() => {
     if (activeFollowList && statusExecute === "idle") {
       init()
@@ -124,24 +172,26 @@ export function FollowList() {
       dispatch(
         setFollowers({
           ...user.followers,
+          status_execute: "finished",
           last_user_log: {
             users: user.followers.users,
             created_at: new Date().toISOString()
           },
-          unfollowed: findUnFollowedUsers(),
-          status_execute: "finished"
+          followed: findFollowedUsers(),
+          unfollowed: findUnFollowedUsers()
         })
       )
       updateUserIndexedDB({
         ...user,
         followers: {
           ...user.followers,
+          status_execute: "finished",
           last_user_log: {
             users: user.followers.users,
             created_at: new Date().toISOString()
           },
-          unfollowed: findUnFollowedUsers(),
-          status_execute: "finished"
+          followed: findFollowedUsers(),
+          unfollowed: findUnFollowedUsers()
         }
       })
     }
@@ -214,7 +264,7 @@ export function FollowList() {
                 </div>
               ))}
             </div>
-            <ComparisonList list={unFollowed} />
+            <ComparisonList unFollowed={unFollowed} followed={followed} />
           </div>
         </div>
       ) : null}

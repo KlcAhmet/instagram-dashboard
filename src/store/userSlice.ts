@@ -62,12 +62,22 @@ const userSlice = createSlice({
       }
     },
     setFollowersUnfollowed: (state, action) => {
-      console.log("setFollowersStatusExecute action.payload", action.payload)
+      console.log("setFollowersUnfollowed action.payload", action.payload)
       return {
         ...state,
         followers: {
           ...state.followers,
           unfollowed: action.payload
+        }
+      }
+    },
+    setFollowersFollowed: (state, action) => {
+      console.log("setFollowersFollowed action.payload", action.payload)
+      return {
+        ...state,
+        followers: {
+          ...state.followers,
+          followed: action.payload
         }
       }
     }
@@ -78,7 +88,8 @@ export const {
   setFollowersUnfollowed,
   setUsername,
   setFollowers,
-  setFollowersStatusExecute
+  setFollowersStatusExecute,
+  setFollowersFollowed
 } = userSlice.actions
 
 export default userSlice.reducer
