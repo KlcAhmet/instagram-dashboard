@@ -12,76 +12,6 @@ import type { TFollowed, TStatusExecute, TUserList } from "~types"
 
 import followersIcon from "../appassets/followers.png"
 
-function ComparisonList({ unFollowed, followed }) {
-  return (
-    <div className="flex flex-col">
-      {/*      <div>
-        <button
-          type="button"
-          className="ml-2 border-2 border-blue-500"
-          onClick={() => {
-            dispatch(
-              setFollowers({
-                ...user.followers,
-                unfollowed: []
-              })
-            )
-          }}>
-          listeyi temizle
-        </button>
-      </div>*/}
-      <div className="max-h-80 overflow-y-scroll">
-        {unFollowed.map((item) => (
-          <div
-            key={`${item.user.pk}-${new Date(item.created_at)}`}
-            className={
-              "flex flex-nowrap items-center mb-1 " +
-              (item.status === "unfollowed" ? "bg-red-700" : "bg-green-700")
-            }>
-            <div>
-              {/*<img
-                  className="rounded-full w-14"
-                  src={user.profile_pic_url}
-                  alt="userimg"
-                  loading="lazy"
-                />*/}
-            </div>
-            <div className="flex flex-col flex-grow ml-2">
-              <p className="">{item.user.username}</p>
-              <p className="">{item.status}</p>
-              <p className="">{`${new Date(item.created_at)}`}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="max-h-80 overflow-y-scroll">
-        {followed.map((item) => (
-          <div
-            key={`${item.user.pk}-${new Date(item.created_at)}`}
-            className={
-              "flex flex-nowrap items-center mb-1 " +
-              (item.status === "unfollowed" ? "bg-red-700" : "bg-green-700")
-            }>
-            <div>
-              {/*<img
-                  className="rounded-full w-14"
-                  src={user.profile_pic_url}
-                  alt="userimg"
-                  loading="lazy"
-                />*/}
-            </div>
-            <div className="flex flex-col flex-grow ml-2">
-              <p className="">{item.user.username}</p>
-              <p className="">{item.status}</p>
-              <p className="">{`${new Date(item.created_at)}`}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export function FollowList() {
   const dispatch = useAppDispatch()
   const [activeFollowList, setActiveFollowList] = useState(false)
@@ -105,26 +35,6 @@ export function FollowList() {
   const followed: Array<TFollowed> = useMemo(() => {
     return user.followers.followed
   }, [user.followers.followed])
-  const ListButtonsProps = useMemo(
-    (
-      bAction = "refresh",
-      props = {
-        onClick: () => {
-          dispatch(
-            setFollowers({
-              ...user.followers,
-              users: []
-            })
-          )
-          updateFollowersStatusExecute("idle")
-        }
-      }
-    ) => {
-      const children = null
-      return ListButtons(bAction, children, props)
-    },
-    []
-  )
 
   function init() {
     setTimeout(() => {
@@ -240,7 +150,20 @@ export function FollowList() {
       </div>
       {activeFollowList ? (
         <div>
-          {ListButtonsProps}
+          {ListButton(
+            {
+              onClick: () => {
+                dispatch(
+                  setFollowers({
+                    ...user.followers,
+                    users: []
+                  })
+                )
+                updateFollowersStatusExecute("idle")
+              }
+            },
+            "Yenile"
+          )}
           <div className="flex flex-nowrap">
             <div>
               {users.map((user) => (
@@ -271,7 +194,25 @@ export function FollowList() {
                 </div>
               ))}
             </div>
-            <ComparisonList unFollowed={unFollowed} followed={followed} />
+            {ComparisonList(
+              {
+                listTop: ListButton(
+                  {
+                    onClick: () => {
+                      dispatch(
+                        setFollowers({
+                          ...user.followers,
+                          unfollowed: []
+                        })
+                      )
+                    }
+                  },
+                  "Listeyi Temizle"
+                )
+              },
+              unFollowed,
+              followed
+            )}
           </div>
         </div>
       ) : null}
@@ -299,21 +240,51 @@ function StatusBar({ statusExecute, activeFollowList, count }) {
   )
 }
 
-function ListButtons(bAction: string, children: ReactNode, props: object) {
-  if (bAction === "refresh") {
-    return (
-      <button
-        type="button"
-        className="ml-2 border-2 border-blue-500"
-        {...props}>
-        {children || "yenile"}
-      </button>
-    )
-  } else {
-    return (
-      <button type="button" className="ml-2 border-2 border-blue-500">
-        Unknow Button
-      </button>
-    )
+function ListButton(props: object, children: ReactNode) {
+  return (
+    <button type="button" className="ml-2 border-2 border-blue-500" {...props}>
+      {children}
+    </button>
+  )
+}
+
+function ComparisonList(
+  children: {
+    listTop?: ReactNode
+  },
+  unFollowed: Array<TFollowed>,
+  followed: Array<TFollowed>
+) {
+  const ListItem = (items: Array<TFollowed>) => {
+    return items.map((item) => (
+      <div
+        key={`${item.user.pk}-${new Date(item.created_at)}`}
+        className={
+          "flex flex-nowrap items-center mb-1 " +
+          (item.status === "unfollowed" ? "bg-red-700" : "bg-green-700")
+        }>
+        <div>
+          {/*<img
+                  className="rounded-full w-14"
+                  src={user.profile_pic_url}
+                  alt="userimg"
+                  loading="lazy"
+                />*/}
+        </div>
+        <div className="flex flex-col flex-grow ml-2">
+          <p className="">{item.user.username}</p>
+          <p className="">{item.status}</p>
+          <p className="">{`${new Date(item.created_at)}`}</p>
+        </div>
+      </div>
+    ))
   }
+
+  return (
+    <div className="flex flex-col">
+      {children.listTop}
+      <div className="max-h-80 overflow-y-scroll">{ListItem(unFollowed)}</div>
+      <div className="max-h-80 overflow-y-scroll">{ListItem(followed)}</div>
+    </div>
+  )
 }
