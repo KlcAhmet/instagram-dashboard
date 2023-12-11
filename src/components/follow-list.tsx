@@ -1,14 +1,11 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react"
 
 import { getFollowerList } from "~api"
+import { findFollowedUsers, findUnFollowedUsers } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
 import { useAppDispatch, useAppSelector } from "~store"
-import {
-  setFollowers,
-  setFollowersStatusExecute,
-  type TUserState
-} from "~store/userSlice"
-import type { TFollowed, TStatusExecute, TUserList } from "~types"
+import { setFollowers, type TUserState } from "~store/userSlice"
+import type { TFollowed } from "~types"
 
 import followersIcon from "../appassets/followers.png"
 
@@ -26,9 +23,9 @@ export function FollowList() {
   const statusExecute = useMemo(() => {
     return user.followers.status_execute
   }, [user.followers.status_execute])
-  const lastUserLogs = useMemo(() => {
-    return user.followers.last_user_log.users
-  }, [user.followers.last_user_log.users])
+  const lastUserLog = useMemo(() => {
+    return user.followers.last_user_log
+  }, [user.followers.last_user_log])
   const unFollowed: Array<TFollowed> = useMemo(() => {
     return user.followers.unfollowed
   }, [user.followers.unfollowed])
@@ -41,7 +38,6 @@ export function FollowList() {
       getFollowerList(maxId).then((data) => {
         dispatch(
           setFollowers({
-            ...user.followers,
             status_execute: "running",
             ...data,
             users: [...user.followers.users, ...data["users"]]
@@ -51,77 +47,27 @@ export function FollowList() {
     }, 1500)
   }
 
-  function updateFollowersStatusExecute(status: TStatusExecute) {
-    dispatch(setFollowersStatusExecute(status))
-  }
-
-  function findUnFollowedUsers(): Array<TFollowed> {
-    const unfollowedUsers = lastUserLogs.filter((user) => {
-      return !users.find((u) => u.pk === user.pk)
-    })
-    const mappedUnfollowedUsers = unfollowedUsers
-      .map((user: TUserList) => {
-        return {
-          user,
-          status: "unfollowed",
-          created_at: new Date().toISOString()
-        }
-      })
-      .filter((user) => user !== null)
-    mappedUnfollowedUsers.push(...unFollowed)
-
-    return mappedUnfollowedUsers
-  }
-
-  function findFollowedUsers(): Array<TFollowed> {
-    const followedUsers = users.filter((user) => {
-      return !lastUserLogs.find((u) => u.pk === user.pk)
-    })
-
-    const mappedFollowedUsers = followedUsers
-      .map((user: TUserList) => {
-        return {
-          user,
-          status: "followed",
-          created_at: new Date().toISOString()
-        }
-      })
-      .filter((user) => user !== null)
-    mappedFollowedUsers.push(...followed)
-    console.log(mappedFollowedUsers)
-    return mappedFollowedUsers
-  }
-
   useEffect(() => {
     if (activeFollowList && statusExecute === "idle") {
       init()
     } else if (maxId && statusExecute === "running") {
       init()
     } else if (!maxId && statusExecute === "running") {
-      updateFollowersStatusExecute("finished")
-      dispatch(
-        setFollowers({
-          ...user.followers,
-          status_execute: "finished",
-          last_user_log: {
-            users: user.followers.users,
-            created_at: new Date().toISOString()
-          },
-          followed: findFollowedUsers(),
-          unfollowed: findUnFollowedUsers()
-        })
-      )
+      const followers = {
+        status_execute: "finished",
+        last_user_log: {
+          users: user.followers.users,
+          created_at: new Date().toISOString()
+        },
+        followed: findFollowedUsers(lastUserLog, users, followed),
+        unfollowed: findUnFollowedUsers(lastUserLog, users, unFollowed)
+      }
+      dispatch(setFollowers(followers))
       updateUserIndexedDB({
         ...user,
         followers: {
           ...user.followers,
-          status_execute: "finished",
-          last_user_log: {
-            users: user.followers.users,
-            created_at: new Date().toISOString()
-          },
-          followed: findFollowedUsers(),
-          unfollowed: findUnFollowedUsers()
+          ...followers
         }
       })
     }
@@ -155,11 +101,10 @@ export function FollowList() {
               onClick: () => {
                 dispatch(
                   setFollowers({
-                    ...user.followers,
+                    status_execute: "idle",
                     users: []
                   })
                 )
-                updateFollowersStatusExecute("idle")
               }
             },
             "Yenile"
@@ -201,7 +146,6 @@ export function FollowList() {
                     onClick: () => {
                       dispatch(
                         setFollowers({
-                          ...user.followers,
                           unfollowed: []
                         })
                       )

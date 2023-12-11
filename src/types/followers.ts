@@ -4,14 +4,16 @@ export type TFollowed = {
   created_at: string
 }
 
+export type TLastUserLog = {
+  created_at: string
+  users: Array<TUserList>
+}
+
 export type TFollowersList = {
   status_execute: TStatusExecute
   next_max_id?: string
   users: Array<TUserList>
-  last_user_log: {
-    created_at: string
-    users: Array<TUserList>
-  }
+  last_user_log: TLastUserLog
   unfollowed: Array<TFollowed>
   followed: Array<TFollowed>
 }
