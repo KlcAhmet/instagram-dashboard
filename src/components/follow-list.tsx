@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, type ReactNode } from "react"
 
 import { getFollowerList } from "~api"
 import { updateUserIndexedDB } from "~indexedDB"
@@ -105,6 +105,26 @@ export function FollowList() {
   const followed: Array<TFollowed> = useMemo(() => {
     return user.followers.followed
   }, [user.followers.followed])
+  const ListButtonsProps = useMemo(
+    (
+      bAction = "refresh",
+      props = {
+        onClick: () => {
+          dispatch(
+            setFollowers({
+              ...user.followers,
+              users: []
+            })
+          )
+          updateFollowersStatusExecute("idle")
+        }
+      }
+    ) => {
+      const children = null
+      return ListButtons(bAction, children, props)
+    },
+    []
+  )
 
   function init() {
     setTimeout(() => {
@@ -220,20 +240,7 @@ export function FollowList() {
       </div>
       {activeFollowList ? (
         <div>
-          <button
-            type="button"
-            className="ml-2 border-2 border-blue-500"
-            onClick={() => {
-              dispatch(
-                setFollowers({
-                  ...user.followers,
-                  users: []
-                })
-              )
-              updateFollowersStatusExecute("idle")
-            }}>
-            yenile
-          </button>
+          {ListButtonsProps}
           <div className="flex flex-nowrap">
             <div>
               {users.map((user) => (
@@ -290,4 +297,23 @@ function StatusBar({ statusExecute, activeFollowList, count }) {
       )}
     </div>
   )
+}
+
+function ListButtons(bAction: string, children: ReactNode, props: object) {
+  if (bAction === "refresh") {
+    return (
+      <button
+        type="button"
+        className="ml-2 border-2 border-blue-500"
+        {...props}>
+        {children || "yenile"}
+      </button>
+    )
+  } else {
+    return (
+      <button type="button" className="ml-2 border-2 border-blue-500">
+        Unknow Button
+      </button>
+    )
+  }
 }
