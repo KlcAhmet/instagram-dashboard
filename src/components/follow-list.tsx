@@ -5,7 +5,7 @@ import { findFollowedUsers, findUnFollowedUsers } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
 import { useAppDispatch, useAppSelector } from "~store"
 import { setFollowers, type TUserState } from "~store/userSlice"
-import type { TFollowed } from "~types"
+import type { TFollowed, TUserList } from "~types"
 
 import followersIcon from "../appassets/followers.png"
 
@@ -96,67 +96,49 @@ export function FollowList() {
       </div>
       {activeFollowList ? (
         <div>
-          {ListButton(
-            {
-              onClick: () => {
-                dispatch(
-                  setFollowers({
-                    status_execute: "idle",
-                    users: []
-                  })
-                )
-              }
-            },
-            "Yenile"
-          )}
           <div className="flex flex-nowrap">
-            <div>
-              {users.map((user) => (
-                <div key={user.pk} className="flex flex-nowrap items-center">
-                  <div>
-                    {/*<img
-                  className="rounded-full w-14"
-                  src={user.profile_pic_url}
-                  alt="userimg"
-                  loading="lazy"
-                />*/}
-                  </div>
-                  <div className="flex flex-col flex-grow ml-2">
-                    <p className="">{user.username}</p>
-                    <div>
-                      <button
-                        type="button"
-                        className="ml-auto border-2 border-blue-500 p-2">
-                        Çıkart
-                      </button>
-                      <button
-                        type="button"
-                        className="ml-auto border-2 bborder-blue-500 p-2">
-                        ---
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="w-72">
+              {ListButton(
+                {
+                  onClick: () => {
+                    dispatch(
+                      setFollowers({
+                        status_execute: "idle",
+                        users: []
+                      })
+                    )
+                  }
+                },
+                "Yenile"
+              )}
+              <div className="max-h-[500px] overflow-y-scroll">
+                {ListItem(users)}
+              </div>
             </div>
-            {ComparisonList(
-              {
-                listTop: ListButton(
-                  {
-                    onClick: () => {
-                      dispatch(
-                        setFollowers({
-                          unfollowed: []
-                        })
-                      )
-                    }
-                  },
-                  "Listeyi Temizle"
-                )
-              },
-              unFollowed,
-              followed
-            )}
+            <div className="w-72">
+              {ListButton(
+                {
+                  onClick: () => {
+                    dispatch(
+                      setFollowers({
+                        unfollowed: []
+                      })
+                    )
+                  }
+                },
+                "Listeyi Temizle"
+              )}
+              <div className="max-h-[500px] overflow-y-scroll">
+                {ListItem(
+                  [...unFollowed, ...followed].sort((a, b) => {
+                    return (
+                      new Date(b.created_at).getTime() -
+                      new Date(a.created_at).getTime()
+                    )
+                  })
+                )}
+              </div>
+            </div>
           </div>
         </div>
       ) : null}
@@ -192,43 +174,39 @@ function ListButton(props: object, children: ReactNode) {
   )
 }
 
-function ComparisonList(
-  children: {
-    listTop?: ReactNode
-  },
-  unFollowed: Array<TFollowed>,
-  followed: Array<TFollowed>
-) {
-  const ListItem = (items: Array<TFollowed>) => {
-    return items.map((item) => (
+const ListItem = (items: Array<TFollowed | TUserList | any>) => {
+  const users = items.map((item) => {
+    if (item?.user) return item
+    return { user: item }
+  })
+  return users.map((item) => {
+    const background = () => {
+      if (item.status === "unfollowed") return "bg-red-700"
+      else if (item.status === "followed") return "bg-green-700"
+      else return "bg-teal-900"
+    }
+    const createdAt = item?.created_at
+      ? new Date(item?.created_at).toISOString()
+      : null
+
+    return (
       <div
-        key={`${item.user.pk}-${new Date(item.created_at)}`}
-        className={
-          "flex flex-nowrap items-center mb-1 " +
-          (item.status === "unfollowed" ? "bg-red-700" : "bg-green-700")
-        }>
+        key={`${item.user.pk}-${new Date(item?.created_at)}`}
+        className={"flex flex-nowrap items-center mb-1 " + background()}>
         <div>
-          {/*<img
-                  className="rounded-full w-14"
-                  src={user.profile_pic_url}
-                  alt="userimg"
-                  loading="lazy"
-                />*/}
+          <img
+            className="rounded-full w-14"
+            src={item.user.profile_pic_url}
+            alt="userimg"
+            loading="lazy"
+          />
         </div>
         <div className="flex flex-col flex-grow ml-2">
           <p className="">{item.user.username}</p>
-          <p className="">{item.status}</p>
-          <p className="">{`${new Date(item.created_at)}`}</p>
+          {item?.status ? <p className="">{item?.status}</p> : null}
+          {item?.created_at ? <p className="">{createdAt}</p> : null}
         </div>
       </div>
-    ))
-  }
-
-  return (
-    <div className="flex flex-col">
-      {children.listTop}
-      <div className="max-h-80 overflow-y-scroll">{ListItem(unFollowed)}</div>
-      <div className="max-h-80 overflow-y-scroll">{ListItem(followed)}</div>
-    </div>
-  )
+    )
+  })
 }

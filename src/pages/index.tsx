@@ -33,7 +33,7 @@ function IndexPage() {
               </button>
             </div>
             {activeProfile ? (
-              <div className="min-w-[400px] max-h-[80vh] overflow-y-scroll">
+              <div className="min-w-[400px] max-h-[750px]">
                 <Login />
                 <Profile />
               </div>
