@@ -1,47 +1,47 @@
 import { useEffect, useMemo, useState } from "react"
 
-import { getFollowerList } from "~api"
+import { getFollowingList } from "~api"
 import { ListButton, ListItem, StatusBar } from "~components/list-items"
 import { findFollowedUsers, findUnFollowedUsers } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
 import { useAppDispatch, useAppSelector } from "~store"
-import { setFollowers, setUser, type TUserState } from "~store/userSlice"
+import { setFollowing, setUser, type TUserState } from "~store/userSlice"
 import type { TFollowed } from "~types"
 
-import ListIcon from "../appassets/followers.png"
+import ListIcon from "../appassets/following.png"
 
-export function FollowerList() {
+export function FollowingList() {
   const dispatch = useAppDispatch()
   const [activeFollowList, setActiveFollowList] = useState(false)
   const user: TUserState = useAppSelector((state) => state.user)
 
   const maxId = useMemo(() => {
-    return user.followers.next_max_id
-  }, [user.followers.next_max_id])
+    return user.following.next_max_id
+  }, [user.following.next_max_id])
   const users = useMemo(() => {
-    return user.followers.users
-  }, [user.followers.users])
+    return user.following.users
+  }, [user.following.users])
   const statusExecute = useMemo(() => {
-    return user.followers.status_execute
-  }, [user.followers.status_execute])
+    return user.following.status_execute
+  }, [user.following.status_execute])
   const lastUserLog = useMemo(() => {
-    return user.followers.last_user_log
-  }, [user.followers.last_user_log])
+    return user.following.last_user_log
+  }, [user.following.last_user_log])
   const unFollowed: Array<TFollowed> = useMemo(() => {
-    return user.followers.unfollowed
-  }, [user.followers.unfollowed])
+    return user.following.unfollowed
+  }, [user.following.unfollowed])
   const followed: Array<TFollowed> = useMemo(() => {
-    return user.followers.followed
-  }, [user.followers.followed])
+    return user.following.followed
+  }, [user.following.followed])
 
   function init() {
     setTimeout(() => {
-      getFollowerList(maxId).then((data) => {
+      getFollowingList(maxId).then((data) => {
         dispatch(
-          setFollowers({
+          setFollowing({
             status_execute: "running",
             ...data,
-            users: [...user.followers.users, ...data["users"]]
+            users: [...user.following.users, ...data["users"]]
           })
         )
       })
@@ -57,7 +57,7 @@ export function FollowerList() {
       const followers = {
         status_execute: "finished",
         last_user_log: {
-          users: user.followers.users,
+          users: user.following.users,
           created_at: new Date().toISOString()
         },
         followed: findFollowedUsers(lastUserLog, users, followed),
@@ -65,14 +65,14 @@ export function FollowerList() {
       }
       dispatch(
         setUser({
-          "edge_followed_by.count": users.length
+          "edge_follow.count": users.length
         })
       )
-      dispatch(setFollowers(followers))
+      dispatch(setFollowing(followers))
       updateUserIndexedDB({
         ...user,
-        followers: {
-          ...user.followers,
+        following: {
+          ...user.following,
           ...followers
         }
       })
@@ -89,7 +89,7 @@ export function FollowerList() {
             <img
               src={`${ListIcon}`}
               className="w-10 h-10 mx-auto"
-              alt="followers"
+              alt="following"
             />
             <span>Takipçiler</span>
           </div>
@@ -108,7 +108,7 @@ export function FollowerList() {
                 {
                   onClick: () => {
                     dispatch(
-                      setFollowers({
+                      setFollowing({
                         status_execute: "idle",
                         users: []
                       })
@@ -126,7 +126,7 @@ export function FollowerList() {
                 {
                   onClick: () => {
                     dispatch(
-                      setFollowers({
+                      setFollowing({
                         unfollowed: [],
                         followed: []
                       })

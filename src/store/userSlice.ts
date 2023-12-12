@@ -8,6 +8,7 @@ import type { TFollowersList, TUserProfile } from "~types"
 
 export type TUserState = TUserProfile & {
   followers: TFollowersList
+  following: TFollowersList
 }
 
 const userSlice = createSlice({
@@ -21,6 +22,14 @@ const userSlice = createSlice({
     username: "",
     ds_user_id: "",
     followers: {
+      status_execute: "idle",
+      next_max_id: "",
+      users: [],
+      last_user_log: { created_at: "", users: [] },
+      unfollowed: [],
+      followed: []
+    },
+    following: {
       status_execute: "idle",
       next_max_id: "",
       users: [],
@@ -46,9 +55,19 @@ const userSlice = createSlice({
           ...action.payload
         }
       }
+    },
+    setFollowing: (state, action) => {
+      console.log("setFollowers action.payload", action.payload)
+      return {
+        ...state,
+        following: {
+          ...state.following,
+          ...action.payload
+        }
+      }
     }
   }
 })
-export const { setUser, setFollowers } = userSlice.actions
+export const { setUser, setFollowers, setFollowing } = userSlice.actions
 
 export default userSlice.reducer
