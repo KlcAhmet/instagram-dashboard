@@ -80,7 +80,7 @@ export function FollowingList() {
   }, [activeFollowList, statusExecute, maxId])
 
   return (
-    <div className="border-2 border-amber-600 inline-block">
+    <div className="border-2 border-fuchsia-600 inline-block">
       <div>
         <button
           onClick={() => setActiveFollowList(!activeFollowList)}
@@ -91,7 +91,7 @@ export function FollowingList() {
               className="w-10 h-10 mx-auto"
               alt="following"
             />
-            <span>Takipçiler</span>
+            <span>Takip</span>
           </div>
           <StatusBar
             activeFollowList={activeFollowList}

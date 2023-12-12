@@ -31,7 +31,7 @@ export function Profile() {
               </div>
             </div>
           </div>
-          <div>
+          <div className="flex flex-nowrap">
             <FollowerList />
             <FollowingList />
           </div>
