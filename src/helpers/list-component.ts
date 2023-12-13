@@ -43,3 +43,9 @@ export function findFollowedUsers(
   mappedFollowedUsers.push(...followed)
   return mappedFollowedUsers
 }
+
+export const ListItemMap = (items: Array<TFollowed | TUserList | any>) =>
+  items.map((item) => {
+    if (item?.user) return item
+    return { user: item }
+  })

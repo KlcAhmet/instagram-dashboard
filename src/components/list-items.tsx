@@ -6,41 +6,34 @@ import type { TFollowed, TUserList } from "~types"
 
 
 
-export const ListItem = (items: Array<TFollowed | TUserList | any>) => {
-  const users = items.map((item) => {
-    if (item?.user) return item
-    return { user: item }
-  })
-  return users.map((item) => {
-    const background = () => {
-      if (item.status === "unfollowed") return "bg-red-700"
-      else if (item.status === "followed") return "bg-green-700"
-      else return "bg-teal-900"
-    }
-    const createdAt = item?.created_at
-      ? new Date(item?.created_at).toISOString()
-      : null
+export function ListItem(item: TFollowed | TUserList | any) {
+  const background = () => {
+    if (item.status === "unfollowed") return "bg-red-700"
+    else if (item.status === "followed") return "bg-green-700"
+    else return "bg-teal-900"
+  }
+  const createdAt = item?.created_at
+    ? new Date(item?.created_at).toISOString()
+    : null
 
-    return (
-      <div
-        key={`${item.user.pk}-${new Date(item?.created_at)}`}
-        className={"flex flex-nowrap items-center mb-1 " + background()}>
-        <div>
-          <img
-            className="rounded-full w-14"
-            src={item.user.profile_pic_url}
-            alt="userimg"
-            loading="lazy"
-          />
-        </div>
-        <div className="flex flex-col flex-grow ml-2">
-          <p className="">{item.user.username}</p>
-          {item?.status ? <p className="">{item?.status}</p> : null}
-          {item?.created_at ? <p className="">{createdAt}</p> : null}
-        </div>
+  return (
+    <div className={"flex flex-nowrap items-center mb-1 " + background()}>
+      <div>
+        <img
+          className="rounded-full w-14"
+          src={item.user.profile_pic_url}
+          alt="userimg"
+          loading="lazy"
+        />
       </div>
-    )
-  })
+      <div className="flex flex-col flex-grow ml-2">
+        <p className="">{item.user.username}</p>
+        {item?.status ? <p className="">{item?.status}</p> : null}
+        {item?.created_at ? <p className="">{createdAt}</p> : null}
+      </div>
+      <div>{item?.children.button}</div>
+    </div>
+  )
 }
 
 export const StatusBar = ({ statusExecute, activeFollowList, count }) => {

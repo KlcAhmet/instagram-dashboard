@@ -1,5 +1,6 @@
 import { type TUserProfile } from "src/types"
 
+import { CompareList } from "~components/compare-list"
 import { FollowerList } from "~components/follower-list"
 import { FollowingList } from "~components/following-list"
 import { useAppSelector } from "~store"
@@ -34,6 +35,7 @@ export function Profile() {
           <div className="flex flex-nowrap">
             <FollowerList />
             <FollowingList />
+            <CompareList />
           </div>
         </div>
       ) : null}

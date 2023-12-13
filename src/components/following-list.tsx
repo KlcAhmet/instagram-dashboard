@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 
 import { getFollowingList } from "~api"
 import { ListButton, ListItem, StatusBar } from "~components/list-items"
-import { findFollowedUsers, findUnFollowedUsers } from "~helpers"
+import { findFollowedUsers, findUnFollowedUsers, ListItemMap } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
 import { useAppDispatch, useAppSelector } from "~store"
 import { setFollowing, setUser, type TUserState } from "~store/userSlice"
@@ -118,7 +118,9 @@ export function FollowingList() {
                 "Yenile"
               )}
               <div className="max-h-[500px] overflow-y-scroll">
-                {ListItem(users)}
+                {ListItemMap(users).map((item) => (
+                  <ListItem {...item} key={`${item.user.pk}-following1`} />
+                ))}
               </div>
             </div>
             <div className="w-72">
@@ -136,14 +138,16 @@ export function FollowingList() {
                 "Listeyi Temizle"
               )}
               <div className="max-h-[500px] overflow-y-scroll">
-                {ListItem(
+                {ListItemMap(
                   [...unFollowed, ...followed].sort((a, b) => {
                     return (
                       new Date(b.created_at).getTime() -
                       new Date(a.created_at).getTime()
                     )
                   })
-                )}
+                ).map((item) => (
+                  <ListItem {...item} key={`${item.user.pk}-folloing2`} />
+                ))}
               </div>
             </div>
           </div>
