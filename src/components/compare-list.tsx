@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react"
 
+import { postUnfollow } from "~api"
 import { ListButton, ListItem } from "~components/list-items"
 import { ListItemMap } from "~helpers"
+import { updateUserIndexedDB } from "~indexedDB"
 import { useAppDispatch, useAppSelector } from "~store"
-import { type TUserState } from "~store/userSlice"
+import { setFollowing, type TUserState } from "~store/userSlice"
 
 import ListIcon from "../appassets/compare.png"
 
@@ -50,17 +52,40 @@ export function CompareList() {
               <div className="max-h-[500px] overflow-y-scroll">
                 <p>Takip Etmeyenler: {following().length}</p>
                 {ListItemMap(following()).map((item) => {
+                  let isPending = false
                   item.children = {
                     button: ListButton(
                       {
                         onClick: () => {
-                          console.log(item)
-                          /*dispatch(
-                            setFollowing({
-                              unfollowed: [],
-                              followed: []
-                            })
-                          )*/
+                          isPending = true
+                          console.log("isPending", isPending)
+
+                          postUnfollow(item.user.pk).then((data) => {
+                            function filterFollowing() {
+                              return followingUsers.filter((item2) => {
+                                if (item2.pk === item.user.pk) return null
+                                return item2
+                              })
+                            }
+
+                            if (data) {
+                              const filteredList = filterFollowing()
+                              dispatch(
+                                setFollowing({
+                                  users: filteredList
+                                })
+                              )
+                              updateUserIndexedDB({
+                                ...user,
+                                following: {
+                                  ...user.following,
+                                  users: filteredList
+                                }
+                              })
+                            }
+                            isPending = false
+                            console.log("isPending", isPending)
+                          })
                         }
                       },
                       "X"

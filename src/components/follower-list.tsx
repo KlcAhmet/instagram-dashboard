@@ -133,6 +133,14 @@ export function FollowerList() {
                         followed: []
                       })
                     )
+                    updateUserIndexedDB({
+                      ...user,
+                      followers: {
+                        ...user.followers,
+                        unfollowed: [],
+                        followed: []
+                      }
+                    })
                   }
                 },
                 "Listeyi Temizle"

@@ -43,3 +43,31 @@ export async function getUserProfile(username: string): Promise<TUserProfile> {
     username: user["username"]
   }
 }
+
+export async function postUnfollow(pk: string) {
+  const cookies = getAllCookies()
+  let headers = new Headers()
+
+  headers.append("x-csrftoken", cookies?.csrftoken)
+  headers.append("x-ig-app-id", config.requestHeaders["x-ig-app-id"])
+
+  let urlencoded = new URLSearchParams()
+  urlencoded.append("user_id", pk)
+
+  let requestOptions = {
+    method: "POST",
+    headers: headers,
+    body: urlencoded
+  }
+
+  let response = fetch(
+    `https://www.instagram.com/api/v1/friendships/destroy/${pk}/`,
+    requestOptions
+  )
+    .then((response) => response.json())
+    .then((result) => result.status)
+    .catch((error) => console.log("error", error))
+
+  const status = await response
+  return status === "ok"
+}

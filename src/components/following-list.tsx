@@ -48,36 +48,48 @@ export function FollowingList() {
     }, 2000)
   }
 
+  function save() {
+    const followers = {
+      status_execute: "finished",
+      last_user_log: {
+        users: user.following.users,
+        created_at: new Date().toISOString()
+      },
+      followed: findFollowedUsers(lastUserLog, users, followed),
+      unfollowed: findUnFollowedUsers(lastUserLog, users, unFollowed)
+    }
+    dispatch(
+      setUser({
+        "edge_follow.count": users.length
+      })
+    )
+    dispatch(setFollowing(followers))
+    updateUserIndexedDB({
+      ...user,
+      following: {
+        ...user.following,
+        ...followers
+      }
+    })
+  }
+
   useEffect(() => {
     if (activeFollowList && statusExecute === "idle") {
       init()
     } else if (maxId && statusExecute === "running") {
       init()
-    } else if (!maxId && statusExecute === "running") {
-      const followers = {
-        status_execute: "finished",
-        last_user_log: {
-          users: user.following.users,
-          created_at: new Date().toISOString()
-        },
-        followed: findFollowedUsers(lastUserLog, users, followed),
-        unfollowed: findUnFollowedUsers(lastUserLog, users, unFollowed)
-      }
-      dispatch(
-        setUser({
-          "edge_follow.count": users.length
-        })
-      )
-      dispatch(setFollowing(followers))
-      updateUserIndexedDB({
-        ...user,
-        following: {
-          ...user.following,
-          ...followers
-        }
-      })
+    } else if (
+      !maxId &&
+      (statusExecute === "running" || statusExecute === "finished")
+    ) {
+      console.log("save")
+      console.log("users", users)
+      console.log("lastUserLog", lastUserLog)
+      console.log("followed", followed)
+      console.log("unFollowed", unFollowed)
+      save()
     }
-  }, [activeFollowList, statusExecute, maxId])
+  }, [activeFollowList, statusExecute, maxId, users])
 
   return (
     <div className="border-2 border-fuchsia-600 inline-block">
@@ -133,6 +145,14 @@ export function FollowingList() {
                         followed: []
                       })
                     )
+                    updateUserIndexedDB({
+                      ...user,
+                      following: {
+                        ...user.following,
+                        unfollowed: [],
+                        followed: []
+                      }
+                    })
                   }
                 },
                 "Listeyi Temizle"

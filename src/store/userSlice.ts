@@ -57,7 +57,7 @@ const userSlice = createSlice({
       }
     },
     setFollowing: (state, action) => {
-      console.log("setFollowers action.payload", action.payload)
+      console.log("setFollowing action.payload", action.payload)
       return {
         ...state,
         following: {
