@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 
 import { getFollowerList } from "~api"
 import { ListButton, ListItem, StatusBar } from "~components/list-items"
+import { Loading } from "~components/loading"
 import { findFollowedUsers, findUnFollowedUsers, ListItemMap } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
 import { useAppDispatch, useAppSelector } from "~store"
@@ -121,6 +122,11 @@ export function FollowerList() {
                 {ListItemMap(users).map((item) => (
                   <ListItem {...item} key={`${item.user.pk}-follower`} />
                 ))}
+                {statusExecute === "running" || !users.length ? (
+                  <div className="h-4">
+                    <Loading />
+                  </div>
+                ) : null}
               </div>
             </div>
             <div className="w-72">

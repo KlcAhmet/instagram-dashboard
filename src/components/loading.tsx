@@ -1,3 +1,3 @@
 export function Loading() {
-  return <div>loading...</div>
+  return <div className="w-full h-full text-center">loading...</div>
 }

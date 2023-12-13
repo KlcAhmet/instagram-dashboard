@@ -2,6 +2,7 @@ import { useMemo, useState } from "react"
 
 import { postUnfollow } from "~api"
 import { ListButton, ListItem } from "~components/list-items"
+import { Loading } from "~components/loading"
 import { ListItemMap } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
 import { useAppDispatch, useAppSelector } from "~store"
@@ -19,6 +20,14 @@ export function CompareList() {
   const followersUsers = useMemo(() => {
     return user.followers.users
   }, [user.followers.users])
+  const statusExecute = useMemo(() => {
+    if (
+      user.followers.status_execute === "running" ||
+      user.following.status_execute === "running"
+    )
+      return true
+    return false
+  }, [user.followers.status_execute, user.following.status_execute])
   const [followingList, setFollowingList] = useState([])
 
   function following() {
@@ -50,49 +59,60 @@ export function CompareList() {
           <div className="flex flex-nowrap">
             <div className="w-72">
               <div className="max-h-[500px] overflow-y-scroll">
-                <p>Takip Etmeyenler: {following().length}</p>
-                {ListItemMap(following()).map((item) => {
-                  let isPending = false
-                  item.children = {
-                    button: ListButton(
-                      {
-                        onClick: () => {
-                          isPending = true
-                          console.log("isPending", isPending)
-
-                          postUnfollow(item.user.pk).then((data) => {
-                            function filterFollowing() {
-                              return followingUsers.filter((item2) => {
-                                if (item2.pk === item.user.pk) return null
-                                return item2
-                              })
-                            }
-
-                            if (data) {
-                              const filteredList = filterFollowing()
-                              dispatch(
-                                setFollowing({
-                                  users: filteredList
-                                })
-                              )
-                              updateUserIndexedDB({
-                                ...user,
-                                following: {
-                                  ...user.following,
-                                  users: filteredList
-                                }
-                              })
-                            }
-                            isPending = false
+                <p>
+                  Takip Etmeyenler:{" "}
+                  {statusExecute || !followersUsers.length
+                    ? null
+                    : following().length}
+                </p>
+                {statusExecute || !followersUsers.length ? (
+                  <div className="h-4">
+                    <Loading />
+                  </div>
+                ) : (
+                  ListItemMap(following()).map((item) => {
+                    let isPending = false
+                    item.children = {
+                      button: ListButton(
+                        {
+                          onClick: () => {
+                            isPending = true
                             console.log("isPending", isPending)
-                          })
-                        }
-                      },
-                      "X"
-                    )
-                  }
-                  return <ListItem {...item} key={`${item.user.pk}`} />
-                })}
+
+                            postUnfollow(item.user.pk).then((data) => {
+                              function filterFollowing() {
+                                return followingUsers.filter((item2) => {
+                                  if (item2.pk === item.user.pk) return null
+                                  return item2
+                                })
+                              }
+
+                              if (data) {
+                                const filteredList = filterFollowing()
+                                dispatch(
+                                  setFollowing({
+                                    users: filteredList
+                                  })
+                                )
+                                updateUserIndexedDB({
+                                  ...user,
+                                  following: {
+                                    ...user.following,
+                                    users: filteredList
+                                  }
+                                })
+                              }
+                              isPending = false
+                              console.log("isPending", isPending)
+                            })
+                          }
+                        },
+                        "X"
+                      )
+                    }
+                    return <ListItem {...item} key={`${item.user.pk}`} />
+                  })
+                )}
               </div>
             </div>
           </div>
