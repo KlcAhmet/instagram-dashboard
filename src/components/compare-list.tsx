@@ -48,7 +48,7 @@ export function CompareList() {
           <div className="flex flex-nowrap">
             <div className="w-72">
               <div className="max-h-[500px] overflow-y-scroll">
-                <p>Takip Etmeyenler: {following.length}</p>
+                <p>Takip Etmeyenler: {following().length}</p>
                 {ListItemMap(following()).map((item) => {
                   item.children = {
                     button: ListButton(

@@ -31,7 +31,7 @@ export function ListItem(item: TFollowed | TUserList | any) {
         {item?.status ? <p className="">{item?.status}</p> : null}
         {item?.created_at ? <p className="">{createdAt}</p> : null}
       </div>
-      <div>{item?.children.button}</div>
+      {item?.children ? <div>{item?.children.button}</div> : null}
     </div>
   )
 }

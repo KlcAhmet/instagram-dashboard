@@ -119,7 +119,7 @@ export function FollowerList() {
               )}
               <div className="max-h-[500px] overflow-y-scroll">
                 {ListItemMap(users).map((item) => (
-                  <ListItem {...item} key={`${item.user.pk}-follower1`} />
+                  <ListItem {...item} key={`${item.user.pk}-follower`} />
                 ))}
               </div>
             </div>
@@ -145,8 +145,11 @@ export function FollowerList() {
                       new Date(a.created_at).getTime()
                     )
                   })
-                ).map((item) => (
-                  <ListItem {...item} key={`${item.user.pk}-follower2`} />
+                ).map((item, index) => (
+                  <ListItem
+                    {...item}
+                    key={`${item.user.pk}-follower-${index}`}
+                  />
                 ))}
               </div>
             </div>
