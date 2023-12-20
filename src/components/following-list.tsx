@@ -83,11 +83,6 @@ export function FollowingList() {
       !maxId &&
       (statusExecute === "running" || statusExecute === "finished")
     ) {
-      console.log("save")
-      console.log("users", users)
-      console.log("lastUserLog", lastUserLog)
-      console.log("followed", followed)
-      console.log("unFollowed", unFollowed)
       save()
     }
   }, [activeFollowList, statusExecute, maxId, users])
