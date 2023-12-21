@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-import type { TFollowersList, TUserProfile } from "~types"
+import type { TFollowersList, TPosts, TUserProfile } from "~types"
 
 
 
@@ -9,6 +9,9 @@ import type { TFollowersList, TUserProfile } from "~types"
 export type TUserState = TUserProfile & {
   followers: TFollowersList
   following: TFollowersList
+  likes: {
+    liked_posts: TPosts
+  }
 }
 
 const userSlice = createSlice({
@@ -36,6 +39,11 @@ const userSlice = createSlice({
       last_user_log: { created_at: "", users: [] },
       unfollowed: [],
       followed: []
+    },
+    likes: {
+      liked_posts: {
+        likes_media_likes: []
+      }
     }
   },
   reducers: {
@@ -65,9 +73,21 @@ const userSlice = createSlice({
           ...action.payload
         }
       }
+    },
+    setLikesMediaLikes: (state, action) => {
+      console.log("setLikesMediaLikes action.payload", action.payload)
+      return {
+        ...state,
+        likes: {
+          liked_posts: {
+            likes_media_likes: action.payload
+          }
+        }
+      }
     }
   }
 })
-export const { setUser, setFollowers, setFollowing } = userSlice.actions
+export const { setUser, setFollowers, setFollowing, setLikesMediaLikes } =
+  userSlice.actions
 
 export default userSlice.reducer

@@ -3,6 +3,7 @@ import { type TUserProfile } from "src/types"
 import { CompareList } from "~components/compare-list"
 import { FollowerList } from "~components/follower-list"
 import { FollowingList } from "~components/following-list"
+import { LikedPosts } from "~components/liked-posts"
 import { useAppSelector } from "~store"
 
 
@@ -36,6 +37,7 @@ export function Profile() {
             <FollowerList />
             <FollowingList />
             <CompareList />
+            <LikedPosts />
           </div>
         </div>
       ) : null}
