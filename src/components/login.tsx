@@ -40,7 +40,6 @@ export function Login() {
   }
 
   function passToEventListeners(key: string) {
-    let count = 0
     if (key === "n") {
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "n" }))
       setUsername(username + key)

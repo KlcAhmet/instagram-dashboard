@@ -1,2 +1,2 @@
 export * from "~api/user/profile"
-export * from "~api/user/follower-list"
+export * from "~api/user/follow-list"

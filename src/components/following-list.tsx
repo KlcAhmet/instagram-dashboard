@@ -46,7 +46,7 @@ export function FollowingList() {
           })
         )
       })
-    }, 2000)
+    }, 5000)
   }
 
   function save() {
@@ -56,8 +56,12 @@ export function FollowingList() {
         users: user.following.users,
         created_at: new Date().toISOString()
       },
-      followed: findFollowedUsers(lastUserLog, users, followed),
-      unfollowed: findUnFollowedUsers(lastUserLog, users, unFollowed)
+      followed: lastUserLog.users.length
+        ? findFollowedUsers(lastUserLog, users, followed)
+        : [],
+      unfollowed: lastUserLog.users
+        ? findUnFollowedUsers(lastUserLog, users, unFollowed)
+        : []
     }
     dispatch(
       setUser({

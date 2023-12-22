@@ -20,14 +20,18 @@ export async function getFollowerList(
     method: "GET",
     headers: headers
   }
-  const response = await fetch(
-    `https://www.instagram.com/api/v1/friendships/${
+
+  let url: string = ""
+  if (maxId)
+    url = `https://www.instagram.com/api/v1/friendships/${
       cookies.ds_user_id
-    }/followers/?count=${23}&${
-      maxId ? `max_id=${maxId}` : "search_surface=follow_list_page"
-    }`,
-    requestOptions
-  )
+    }/followers/?count=${23}&max_id=${maxId}`
+  else
+    url = `https://www.instagram.com/api/v1/friendships/${
+      cookies.ds_user_id
+    }/followers/?count=${23}`
+
+  const response = await fetch(url, requestOptions)
     .then((response) => response.json())
     .then((result) => result)
     .catch((error) => console.log("error", error))
@@ -56,14 +60,18 @@ export async function getFollowingList(
     method: "GET",
     headers: headers
   }
-  const response = await fetch(
-    `https://www.instagram.com/api/v1/friendships/${
+
+  let url: string = ""
+  if (maxId)
+    url = `https://www.instagram.com/api/v1/friendships/${
       cookies.ds_user_id
-    }/following/?count=${50}&${
-      maxId ? `max_id=${maxId}` : "search_surface=follow_list_page"
-    }`,
-    requestOptions
-  )
+    }/following/?count=${50}&max_id=${maxId}`
+  else
+    url = `https://www.instagram.com/api/v1/friendships/${
+      cookies.ds_user_id
+    }/following/?count=${50}`
+
+  const response = await fetch(url, requestOptions)
     .then((response) => response.json())
     .then((result) => result)
     .catch((error) => console.log("error", error))
