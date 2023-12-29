@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
 
+import { postUnlike } from "~api/movements/unlike"
 import { ListButton, StatusBar } from "~components/list-items"
 import { updateUserIndexedDB } from "~indexedDB"
 import { useAppDispatch, useAppSelector } from "~store"
@@ -105,6 +106,16 @@ export function LikedPosts() {
                               <p>{item.title}</p>
                               <p>{item.string_list_data[0].href}</p>
                               <p>{ts}</p>
+                              <div>
+                                {ListButton(
+                                  {
+                                    onClick: () => {
+                                      postUnlike(item.string_list_data[0].href)
+                                    }
+                                  },
+                                  "X"
+                                )}
+                              </div>
                             </div>
                           )
                         })}
@@ -120,19 +131,3 @@ export function LikedPosts() {
     </div>
   )
 }
-
-/*
-unlike
-
-https://www.instagram.com/reel/CxNzNjfMCRn/
-
-fb_dtsg:
- "DTSGInitData": {
-    "token": "NAcP0ZNPw_k41imNPmIja2WIFjl_m8xWC5kUPi7BEYkSvqLl_xVW3hw:17853599968089360:1700826290",
-    "async_get_token": "AQx7DLraU5orsHUSSb3zC2ECp8J7UcJ5nHXruMHgsZvOD9GG:17853599968089360:1700826290"
-},
-
-variables: "page_id": "postPage_3192432942705026151",
-
-doc_id:  <script src="https://static.cdninstagram.com/rsrc.php/v3iCYI4/y8/l/makehaste_jhash/_SaD8dG4YG43s1xTRi65WVSXMX--ykgWcd6G11ErteRPKx7l7itV0BXappxhWHMZSX.js?_nc_x=Ij3Wp8lg5Kz" data-bootloader-hash="MLJzGmE" async="1" crossorigin="anonymous" data-tsrc="https://static.cdninstagram.com/rsrc-translations.php/v6icfU4/yF/l/tr_TR/_SaD8dG4YG43s1xTRi65WVSXMX--ykgWcd6G11ErteRPKx7l7itV0BXappxhWHMZSX.js?_nc_x=Ij3Wp8lg5Kz" data-p=":38,15,21,161,115,16" data-btmanifest="1010545497_main" data-c="1" nonce="7KPyCtin"></script>
-*/
