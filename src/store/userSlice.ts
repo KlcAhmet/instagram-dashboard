@@ -42,7 +42,12 @@ const userSlice = createSlice({
     },
     likes: {
       liked_posts: {
-        likes_media_likes: []
+        likes_media_likes: [],
+        status_execute: "idle",
+        filter: {
+          followers: false,
+          following: false
+        }
       }
     }
   },
@@ -80,14 +85,48 @@ const userSlice = createSlice({
         ...state,
         likes: {
           liked_posts: {
+            ...state.likes.liked_posts,
             likes_media_likes: action.payload
+          }
+        }
+      }
+    },
+    setLikesMediaLikesStatusExecute: (state, action) => {
+      console.log(
+        "setLikesMediaLikesStatusExecute action.payload",
+        action.payload
+      )
+      return {
+        ...state,
+        likes: {
+          liked_posts: {
+            ...state.likes.liked_posts,
+            status_execute: action.payload
+          }
+        }
+      }
+    },
+    setLikesMediaLikesFilter: (state, action) => {
+      console.log("setLikesMediaLikesFilter action.payload", action.payload)
+      return {
+        ...state,
+        likes: {
+          liked_posts: {
+            ...state.likes.liked_posts,
+            filter: action.payload
           }
         }
       }
     }
   }
 })
-export const { setUser, setFollowers, setFollowing, setLikesMediaLikes } =
-  userSlice.actions
+export const {
+  setUser,
+  setFollowers,
+  setFollowing,
+  setLikesMediaLikes,
+  setLikesMediaLikesStatusExecute,
+  setLikesMediaLikesFilter
+} = userSlice.actions
 
 export default userSlice.reducer

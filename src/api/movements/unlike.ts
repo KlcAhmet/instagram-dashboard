@@ -136,10 +136,11 @@ export async function postUnlike(url: string): Promise<boolean> {
     body: urlencoded
   }
 
-  fetch("https://www.instagram.com/api/graphql", requestOptions)
+  return fetch("https://www.instagram.com/api/graphql", requestOptions)
     .then((response) => response.json())
-    .then((result) => console.log(result))
-    .catch((error) => console.log("error", error))
-
-  return true
+    .then(() => true)
+    .catch((error) => {
+      console.log("error", error)
+      return false
+    })
 }
