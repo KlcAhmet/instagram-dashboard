@@ -1,10 +1,10 @@
 import { Suspense, useEffect, useState } from "react"
+import { useAppDispatch, useAppSelector } from "src/store"
 
 import { getUserProfile } from "~api"
 import { Loading } from "~components/loading"
 import { getAllCookies } from "~helpers"
 import { getUsersIndexedDB, setUserIndexedDB } from "~indexedDB"
-import { useAppDispatch, useAppSelector } from "~store"
 import { setUser, type TUserState } from "~store/userSlice"
 
 
@@ -25,18 +25,11 @@ export function Login() {
 
   function init() {
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "b" }))
-    const passBKey = setInterval(() => {
-      const overlay = document.getElementsByClassName("x1n2onr6 xzkaem6")[0]
-      if (overlay && !overlay["hidden"]) {
-        overlay["hidden"] = true
-      }
-    }, 100)
     setTimeout(() => {
-      clearInterval(passBKey)
-    }, 1000)
-    getUsersIndexedDB().then((db) => {
-      setUsersIndexedDB(db)
-    })
+      getUsersIndexedDB().then((db) => {
+        setUsersIndexedDB(db)
+      })
+    }, 2000)
   }
 
   function passToEventListeners(key: string) {
@@ -91,6 +84,7 @@ function UserList({ users, cookieStore }) {
   const dispatch = useAppDispatch()
 
   function getUserByUsername(username: string) {
+    console.log("getUserByUsername", username)
     getUserProfile(username).then((user) => {
       if (user.id === cookieStore.ds_user_id) {
         dispatch(setUser(user))

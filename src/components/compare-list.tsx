@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react"
+import { useAppDispatch, useAppSelector } from "src/store"
 
 import { postUnfollow } from "~api"
 import { ListButton, ListItem } from "~components/list-items"
 import { Loading } from "~components/loading"
 import { ListItemMap } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
-import { useAppDispatch, useAppSelector } from "~store"
 import { setFollowing, type TUserState } from "~store/userSlice"
 
 import ListIcon from "../appassets/compare.png"

@@ -1,9 +1,5 @@
 import styleText from "data-text:~appassets/global.css"
-import type {
-  PlasmoCSConfig,
-  PlasmoGetOverlayAnchor,
-  PlasmoGetStyle
-} from "plasmo"
+import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo"
 import { type FC } from "react"
 
 import IndexPage from "~pages/index"
@@ -23,13 +19,11 @@ export const getStyle: PlasmoGetStyle = () => {
   style.textContent = styleText
   return style
 }
-
-export const getOverlayAnchor: PlasmoGetOverlayAnchor = async () =>
-  document.querySelector("body")
-
-export const getShadowHostId = () => "plasmo-anchor"
-
 const PlasmoOverlay: FC = () => {
+  document.body.remove()
+  document.head.remove()
+  document.firstElementChild.className = ""
+
   return <IndexPage />
 }
 export default PlasmoOverlay

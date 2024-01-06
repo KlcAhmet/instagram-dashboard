@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react"
+import { useAppDispatch, useAppSelector } from "src/store"
 
 import { postUnlike } from "~api/movements/unlike"
 import { ListButton, StatusBar } from "~components/list-items"
 import { updateUserIndexedDB } from "~indexedDB"
-import { useAppDispatch, useAppSelector } from "~store"
 import {
   setLikesMediaLikes,
   setLikesMediaLikesFilter,

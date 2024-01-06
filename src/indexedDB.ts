@@ -29,8 +29,8 @@ export async function getUsersIndexedDB(): Promise<any> {
     }
 
     getAllRequest.onerror = function () {
-      reject(getAllRequest.error)
       console.error("getAllRequest DB Error", getAllRequest.error)
+      reject(getAllRequest.error)
     }
   })
   return await response
@@ -53,7 +53,7 @@ export async function setUserIndexedDB(data: any) {
     }
 
     request.onerror = function () {
-      console.log("Error", request.error)
+      console.log("setUserIndexedDB Error", request.error)
       reject(request.error)
     }
   })

@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react"
+import { useAppDispatch, useAppSelector } from "src/store"
 
 import { getFollowerList } from "~api"
 import { ListButton, ListItem, StatusBar } from "~components/list-items"
 import { Loading } from "~components/loading"
 import { findFollowedUsers, findUnFollowedUsers, ListItemMap } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
-import { useAppDispatch, useAppSelector } from "~store"
 import { setFollowers, setUser, type TUserState } from "~store/userSlice"
 import type { TFollowed } from "~types"
 
