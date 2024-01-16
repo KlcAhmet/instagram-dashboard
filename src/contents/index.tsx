@@ -1,6 +1,5 @@
 import styleText from "data-text:~appassets/global.css"
 import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo"
-import { type FC } from "react"
 
 import IndexPage from "~pages/index"
 
@@ -19,11 +18,13 @@ export const getStyle: PlasmoGetStyle = () => {
   style.textContent = styleText
   return style
 }
-const PlasmoOverlay: FC = () => {
+
+const PlasmoInline = () => {
   document.body.remove()
   document.head.remove()
   document.firstElementChild.className = ""
 
   return <IndexPage />
 }
-export default PlasmoOverlay
+
+export default PlasmoInline

@@ -1,26 +1,36 @@
-const indexedDBName = "instagram-dashboard"
+import { store } from "~store"
+import { setConnected, setError } from "~store/indexedDbSlice"
 
-let openRequest = window.indexedDB.open(indexedDBName, 1)
+const dbName = "instagram-dashboard-users"
+const dbVersion = 1
 
-openRequest.onupgradeneeded = function () {
-  let db = openRequest.result
-  if (!db.objectStoreNames.contains(indexedDBName))
-    db.createObjectStore(indexedDBName, { keyPath: "ds_user_id" })
+let openRequest = window.indexedDB.open(dbName, dbVersion)
+
+openRequest.onsuccess = () => {
+  const db = openRequest.result
+  console.log("DB Opened", openRequest.result)
+  if (db.objectStoreNames.length !== 0) store.dispatch(setConnected(true))
 }
 
-openRequest.onsuccess = function () {
-  console.log("DB onsuccess")
+openRequest.onupgradeneeded = () => {
+  console.log("DB Upgrade Needed")
+  const db = openRequest.result
+  if (db.objectStoreNames.length === 0) {
+    db.createObjectStore(dbName, { keyPath: "ds_user_id" })
+  }
+  store.dispatch(setConnected(true))
 }
 
-openRequest.onerror = function () {
-  console.error("DB Error", openRequest.error)
+openRequest.onerror = () => {
+  console.log("DB Error", openRequest.error)
+  store.dispatch(setError(openRequest.error))
 }
 
 export async function getUsersIndexedDB(): Promise<any> {
   let response = new Promise((resolve, reject) => {
     const db = openRequest.result
-    const transaction = db.transaction(indexedDBName, "readwrite")
-    const store = transaction.objectStore(indexedDBName)
+    const transaction = db.transaction(dbName, "readwrite")
+    const store = transaction.objectStore(dbName)
     const getAllRequest = store.getAll()
 
     getAllRequest.onsuccess = () => {
@@ -39,8 +49,8 @@ export async function getUsersIndexedDB(): Promise<any> {
 export async function setUserIndexedDB(data: any) {
   let response = new Promise((resolve, reject) => {
     const db = openRequest.result
-    const transaction = db.transaction(indexedDBName, "readwrite")
-    let users = transaction.objectStore(indexedDBName)
+    const transaction = db.transaction(dbName, "readwrite")
+    let users = transaction.objectStore(dbName)
     const request = users.add({
       ...data,
       ds_user_id: data.id,
@@ -63,8 +73,8 @@ export async function setUserIndexedDB(data: any) {
 export async function updateUserIndexedDB(data: any) {
   let response = new Promise((resolve, reject) => {
     const db = openRequest.result
-    const transaction = db.transaction(indexedDBName, "readwrite")
-    let users = transaction.objectStore(indexedDBName)
+    const transaction = db.transaction(dbName, "readwrite")
+    let users = transaction.objectStore(dbName)
     const request = users.put({
       ...data,
       ds_user_id: data.id,
