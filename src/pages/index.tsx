@@ -26,7 +26,7 @@ function IndexPage() {
 function MainLayout() {
   const connected = useAppSelector((state) => state.indexedDb.connected)
   const [isLogin, setIsLogin] = useState(false)
-  const BaseLayout = ({ children }) => {
+  const Base = ({ children }) => {
     return (
       <div className="flex bg-charcoal text-white w-screen min-h-screen">
         {children}
@@ -36,7 +36,7 @@ function MainLayout() {
 
   if (!connected) {
     return (
-      <BaseLayout>
+      <Base>
         <Loading imgClassName="w-24" direction="column" animation>
           <LoadingInfoText
             text="Please wait..."
@@ -44,21 +44,21 @@ function MainLayout() {
             animation
           />
         </Loading>
-      </BaseLayout>
+      </Base>
     )
   } else if (!isLogin) {
     return (
-      <BaseLayout>
+      <Base>
         <div className="m-auto mt-48">
           <Login isLogin={setIsLogin} />
         </div>
-      </BaseLayout>
+      </Base>
     )
   }
   return (
-    <BaseLayout>
+    <Base>
       <Profile />
-    </BaseLayout>
+    </Base>
   )
 }
 
