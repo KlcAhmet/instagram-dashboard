@@ -1,6 +1,9 @@
+import LoadingIcon from "data-base64:~assets/app/loading.png"
 import { type ReactNode } from "react"
 
-import LoadingIcon from "../appassets/loading.png"
+
+
+
 
 type LoadingProps = {
   children?: ReactNode
