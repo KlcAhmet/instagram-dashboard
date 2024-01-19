@@ -37,7 +37,7 @@ function MainLayout() {
   if (!connected) {
     return (
       <Base>
-        <Loading imgClassName="w-24" direction="column" animation>
+        <Loading imgClass="h-24" direction="column" animation>
           <LoadingInfoText
             text="Please wait..."
             className="mt-3 text-xl"

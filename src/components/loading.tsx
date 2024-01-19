@@ -8,14 +8,15 @@ import { type ReactNode } from "react"
 type LoadingProps = {
   children?: ReactNode
   direction?: "row" | "column"
-  imgClassName?: string
+  imgClass?: string
   animation?: boolean
+  size?: number
 }
 
 export function Loading({
   children,
   direction = "row",
-  imgClassName,
+  imgClass,
   animation = false
 }: LoadingProps) {
   const style = {
@@ -24,9 +25,6 @@ export function Loading({
   // Base div
   const Direction = direction === "row" ? "flex-row" : "flex-col"
   const Class = `w-full h-full flex items-center justify-center ${Direction}`
-
-  // img
-  const imgClass = imgClassName ?? "w-16"
 
   return (
     <div className={Class}>
