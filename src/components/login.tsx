@@ -1,112 +1,131 @@
-import { Suspense, useEffect, useState } from "react"
-import { useAppDispatch, useAppSelector } from "src/store"
+import { useEffect, useRef, useState } from "react"
+import { useAppDispatch } from "src/store"
 
 import { getUserProfile } from "~api"
-import { Loading } from "~components/loading"
-import { getAllCookies } from "~helpers"
-import { getUsersIndexedDB, setUserIndexedDB } from "~indexedDB"
+import { Button, ButtonText } from "~components/cbutton"
+import { Input, InputLayout } from "~components/cinput"
+import { Loading, LoadingInfoText } from "~components/loading"
+import { bypassWindowEventForKeys, getAllCookies } from "~helpers"
+import {
+  getUsersIndexedDB,
+  setUserIndexedDB,
+  updateUserIndexedDB
+} from "~indexedDB"
 import { setUser, type TUserState } from "~store/userSlice"
 
 
 
 
 
-// TODO: farklı hesap uyarısı ve hata mesajları
-export function Login() {
+export function Login({ isLogin }) {
   const dispatch = useAppDispatch()
-  const user: TUserState = useAppSelector((state) => state.user)
   const cookieStore = getAllCookies()
-  const [username, setUsername] = useState("")
-  const [usersIndexedDB, setUsersIndexedDB] = useState([]) as any[]
+  const username = useRef(null)
+  const [loginButtonLoading, setLoginButtonLoading] = useState(false)
 
-  useEffect(() => {
-    init()
-  }, [])
-
-  function init() {
-    window.dispatchEvent(new KeyboardEvent("keydown", { key: "b" }))
-    setTimeout(() => {
-      getUsersIndexedDB().then((db) => {
-        setUsersIndexedDB(db)
-      })
-    }, 2000)
-  }
-
-  function passToEventListeners(key: string) {
-    if (key === "n") {
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "n" }))
-      setUsername(username + key)
-    }
-    if (key === "b") {
-      setUsername(username + key)
-    }
-  }
-
-  function getUser() {
-    getUserProfile(username).then((user) => {
-      if (user.id === cookieStore.ds_user_id) {
-        console.log("getUserProfile", user)
-        setUserIndexedDB(user)
-        dispatch(setUser(user))
+  function loginUser(user?: TUserState) {
+    setLoginButtonLoading(true)
+    getUserProfile(user ? user.username : username.current.value).then(
+      (data) => {
+        if (data.id === cookieStore.ds_user_id) {
+          const userData = {
+            ...user,
+            ...data
+          }
+          if (user) {
+            updateUserIndexedDB(userData).then(() => {
+              dispatch(setUser(userData))
+              isLogin(true)
+            })
+          } else {
+            setUserIndexedDB(userData).then(() => {
+              dispatch(setUser(userData))
+              isLogin(true)
+            })
+          }
+        }
       }
-    })
+    )
+  }
+
+  function setUsername(key: string) {
+    username.current.value += key
   }
 
   return (
     <>
-      {!user.id ? (
-        <div className="space-y-3">
-          <div>
-            <Suspense fallback={<Loading />}>
-              <UserList users={usersIndexedDB} cookieStore={cookieStore} />
-            </Suspense>
-          </div>
-          <div>
-            <label>Username: </label>
-            <input
+      <div className="space-y-3 bg-navy rounded-xl p-6 min-w-[300px]">
+        <UserList loginUser={loginUser} className="mb-10" />
+        <div className="flex flex-col">
+          <InputLayout header="Username">
+            <Input
+              ref={username}
+              placeholder="_"
+              onKeyDown={(e) => setUsername(bypassWindowEventForKeys(e.key))}
+            />
+          </InputLayout>
+          {/* <InputLayout header="Username">
+            <Input
               type="text"
               name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              onKeyDown={(e) => passToEventListeners(e.key)}
+              ref={username}
+              className="text-black"
+              onKeyDown={(e) => setUsername(bypassWindowEventForKeys(e.key))}
             />
-            <button type="button" onClick={getUser}>
-              Get User
-            </button>
-          </div>
+          </InputLayout>*/}
+          <Button loading={loginButtonLoading} onClick={() => loginUser()} big>
+            <ButtonText text="Login" big />
+          </Button>
         </div>
-      ) : null}
+      </div>
     </>
   )
 }
 
-function UserList({ users, cookieStore }) {
-  const dispatch = useAppDispatch()
+function UserList({ loginUser, ...props }) {
+  const [usersIndexedDB, setUsersIndexedDB] = useState([]) as any[]
+  const [loading, setLoading] = useState(true)
 
-  function getUserByUsername(username: string) {
-    console.log("getUserByUsername", username)
-    getUserProfile(username).then((user) => {
-      if (user.id === cookieStore.ds_user_id) {
-        dispatch(setUser(user))
-      }
+  useEffect(() => {
+    getUsersIndexedDB().then((result) => {
+      setUsersIndexedDB(result)
+      setLoading(false)
     })
+  }, [])
+
+  if (loading) {
+    return (
+      <Loading
+        direction="row"
+        imgClass="h-7"
+        animation
+        children={LoadingInfoText({
+          text: "Kayıtlı kullanıcılar yükleniyor...",
+          className: "ml-3 text-sm font-normal"
+        })}
+      />
+    )
   }
+  if (usersIndexedDB.length === 0) return null
 
   return (
-    <div>
-      {users.map((user) => (
+    <div className={props.className}>
+      {usersIndexedDB.map((user) => (
         <button
           key={user.id}
           type="button"
-          onClick={() => getUserByUsername(user.username)}
+          onClick={() => loginUser(user)}
           className="flex flex-row flex-nowrap items-center">
           <img
             src={user.profile_pic_url}
-            className="rounded-full w-10 h-10 mr-5"
+            className="rounded-full w-14 mr-5"
             alt="profile"
             loading="lazy"
           />
-          <span>{user.username}</span>
+          <div className="text-start">
+            <h6 className="text-secondary text-base">{user.full_name}</h6>
+            <span className="text-brown text-sm">@{user.username}</span>
+          </div>
         </button>
       ))}
     </div>
