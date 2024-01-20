@@ -2,7 +2,6 @@ import type { TUserProfile } from "src/types"
 
 import config from "~config.json"
 import { getAllCookies } from "~helpers"
-import { getUsersIndexedDB } from "~indexedDB"
 
 
 
@@ -30,11 +29,7 @@ export async function getUserProfile(username: string): Promise<TUserProfile> {
 
   const user = await response
 
-  const users: [] = await getUsersIndexedDB()
-  const userDB: {} = users.find((item: any) => item.ds_user_id === user.id)
-
   return {
-    ...userDB,
     id: user["id"],
     full_name: user["full_name"],
     "edge_followed_by.count": user["edge_followed_by"]["count"],
