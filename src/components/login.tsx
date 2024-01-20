@@ -3,7 +3,7 @@ import { useAppDispatch } from "src/store"
 
 import { getUserProfile } from "~api"
 import { Button, ButtonText } from "~components/cbutton"
-import { Input, InputLayout } from "~components/cinput"
+import { Input, InputError, InputLayout } from "~components/cinput"
 import { Loading, LoadingInfoText } from "~components/loading"
 import { bypassWindowEventForKeys, getAllCookies } from "~helpers"
 import {
@@ -22,11 +22,12 @@ export function Login({ isLogin }) {
   const cookieStore = getAllCookies()
   const username = useRef(null)
   const [loginButtonLoading, setLoginButtonLoading] = useState(false)
+  const [errorMessages, setErrorMessages] = useState(null)
 
   function loginUser(user?: TUserState) {
     setLoginButtonLoading(true)
-    getUserProfile(user ? user.username : username.current.value).then(
-      (data) => {
+    getUserProfile(user ? user.username : username.current.value)
+      .then((data) => {
         if (data.id === cookieStore.ds_user_id) {
           const userData = {
             ...user,
@@ -43,9 +44,17 @@ export function Login({ isLogin }) {
               isLogin(true)
             })
           }
+        } else {
+          setErrorMessages(
+            "İnstagrama giriş yaptığın hesap ile giriş yapmalısın"
+          )
+          setLoginButtonLoading(false)
         }
-      }
-    )
+      })
+      .catch(() => {
+        setErrorMessages("Kullanıcı bulunamadı")
+        setLoginButtonLoading(false)
+      })
   }
 
   function setUsername(key: string) {
@@ -54,7 +63,7 @@ export function Login({ isLogin }) {
 
   return (
     <>
-      <div className="space-y-3 bg-navy rounded-xl p-6 min-w-[300px]">
+      <div className="space-y-3 bg-navy rounded-xl p-6 w-[300px]">
         <UserList loginUser={loginUser} className="mb-10" />
         <div className="flex flex-col">
           <InputLayout header="Username">
@@ -63,16 +72,8 @@ export function Login({ isLogin }) {
               placeholder="_"
               onKeyDown={(e) => setUsername(bypassWindowEventForKeys(e.key))}
             />
+            <InputError text={errorMessages} />
           </InputLayout>
-          {/* <InputLayout header="Username">
-            <Input
-              type="text"
-              name="username"
-              ref={username}
-              className="text-black"
-              onKeyDown={(e) => setUsername(bypassWindowEventForKeys(e.key))}
-            />
-          </InputLayout>*/}
           <Button loading={loginButtonLoading} onClick={() => loginUser()} big>
             <ButtonText text="Login" big />
           </Button>
@@ -123,8 +124,12 @@ function UserList({ loginUser, ...props }) {
             loading="lazy"
           />
           <div className="text-start">
-            <h6 className="text-secondary text-base">{user.full_name}</h6>
-            <span className="text-brown text-sm">@{user.username}</span>
+            <h6 className="text-secondary text-base line-clamp-1">
+              {user.full_name}
+            </h6>
+            <span className="text-brown text-sm line-clamp-1">
+              @{user.username}
+            </span>
           </div>
         </button>
       ))}

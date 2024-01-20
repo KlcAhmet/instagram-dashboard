@@ -32,3 +32,8 @@ export const Input = forwardRef(
     return <input ref={ref} className={Class} {...props} />
   }
 )
+
+export function InputError({ text }: { text?: string }) {
+  if (!text) return null
+  return <div className="text-red-500 text-xs font-normal mt-1">{text}</div>
+}
