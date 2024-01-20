@@ -18,12 +18,23 @@ const userSlice = createSlice({
   name: "user",
   initialState: <TUserState>{
     id: "",
+    ds_user_id: "",
     full_name: "",
     "edge_followed_by.count": 0,
     "edge_follow.count": 0,
     profile_pic_url: "",
+    profile_pic_url_hd: "",
     username: "",
-    ds_user_id: "",
+    biography: "",
+    hide_like_and_view_counts: false,
+    is_business_account: false,
+    is_professional_account: false,
+    is_private: false,
+    is_verified: false,
+    edge_mutual_followed_by: {
+      count: 0,
+      edges: []
+    },
     followers: {
       status_execute: "idle",
       next_max_id: "",
