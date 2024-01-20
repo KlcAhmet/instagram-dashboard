@@ -39,10 +39,15 @@ export function Login({ isLogin }) {
               isLogin(true)
             })
           } else {
-            setUserIndexedDB(userData).then(() => {
-              dispatch(setUser(userData))
-              isLogin(true)
-            })
+            setUserIndexedDB(userData)
+              .then(() => {
+                dispatch(setUser(userData))
+                isLogin(true)
+              })
+              .catch(() => {
+                setErrorMessages("Bu kullanıcı zaten kayıtlı")
+                setLoginButtonLoading(false)
+              })
           }
         } else {
           setErrorMessages(
