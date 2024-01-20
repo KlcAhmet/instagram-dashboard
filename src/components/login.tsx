@@ -12,6 +12,7 @@ import {
   updateUserIndexedDB
 } from "~indexedDB"
 import { setUser, type TUserState } from "~store/userSlice"
+import type { TUserProfile } from "~types"
 
 
 
@@ -27,8 +28,14 @@ export function Login({ isLogin }) {
   function loginUser(user?: TUserState) {
     setLoginButtonLoading(true)
     getUserProfile(user ? user.username : username.current.value)
-      .then((data) => {
-        if (data.id === cookieStore.ds_user_id) {
+      .then((data: number | TUserProfile) => {
+        if (typeof data === "number") {
+          /*
+           * add 404 429 status code
+           */
+          setErrorMessages(data.toString())
+          setLoginButtonLoading(false)
+        } else if (data.id === cookieStore.ds_user_id) {
           const userData = {
             ...user,
             ...data
