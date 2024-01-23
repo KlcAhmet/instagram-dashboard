@@ -9,56 +9,6 @@
         console.error("Error loading image:", error)
       })*!/
   }*/
-/*  async function getImage(val: number) {
-    setImgSrc(<img src={`data-base64:~assets/button-type/3.png`} alt="icon" />)
-    /!*import(`data-base64:~assets/button-type/${val}.png`)
-      .then((image) => {
-        setImgSrc(<img src={`${image}`} alt="icon" />)
-      })
-      .catch((error) => {
-        console.error("Error loading image:", error)
-      })*!/
-  }*/
-/*  async function getImage(val: number) {
-    setImgSrc(<img src={`data-base64:~assets/button-type/3.png`} alt="icon" />)
-    /!*import(`data-base64:~assets/button-type/${val}.png`)
-      .then((image) => {
-        setImgSrc(<img src={`${image}`} alt="icon" />)
-      })
-      .catch((error) => {
-        console.error("Error loading image:", error)
-      })*!/
-  }*/
-/*  async function getImage(val: number) {
-    setImgSrc(<img src={`data-base64:~assets/button-type/3.png`} alt="icon" />)
-    /!*import(`data-base64:~assets/button-type/${val}.png`)
-      .then((image) => {
-        setImgSrc(<img src={`${image}`} alt="icon" />)
-      })
-      .catch((error) => {
-        console.error("Error loading image:", error)
-      })*!/
-  }*/
-/*  async function getImage(val: number) {
-    setImgSrc(<img src={`data-base64:~assets/button-type/3.png`} alt="icon" />)
-    /!*import(`data-base64:~assets/button-type/${val}.png`)
-      .then((image) => {
-        setImgSrc(<img src={`${image}`} alt="icon" />)
-      })
-      .catch((error) => {
-        console.error("Error loading image:", error)
-      })*!/
-  }*/
-/*  async function getImage(val: number) {
-    setImgSrc(<img src={`data-base64:~assets/button-type/3.png`} alt="icon" />)
-    /!*import(`data-base64:~assets/button-type/${val}.png`)
-      .then((image) => {
-        setImgSrc(<img src={`${image}`} alt="icon" />)
-      })
-      .catch((error) => {
-        console.error("Error loading image:", error)
-      })*!/
-  }*/
 import type { ImgHTMLAttributes } from 'react';
 import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 
