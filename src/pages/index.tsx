@@ -28,8 +28,8 @@ function MainLayout() {
   const [isLogin, setIsLogin] = useState(false)
   const Base = ({ children }) => {
     return (
-      <div className="flex bg-charcoal text-white w-screen min-h-screen">
-        {children}
+      <div className="flex bg-charcoal text-white w-screen min-h-screen overflow-auto">
+        <div className="container mx-auto">{children}</div>
       </div>
     )
   }
@@ -49,7 +49,7 @@ function MainLayout() {
   } else if (!isLogin) {
     return (
       <Base>
-        <div className="m-auto mt-48">
+        <div className=" mt-48 flex justify-center">
           <Login isLogin={setIsLogin} />
         </div>
       </Base>
