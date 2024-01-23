@@ -35,6 +35,7 @@ const userSlice = createSlice({
       count: 0,
       edges: []
     },
+    is_joined_recently: false,
     followers: {
       status_execute: "idle",
       next_max_id: "",

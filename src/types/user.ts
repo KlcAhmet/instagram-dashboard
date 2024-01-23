@@ -16,4 +16,5 @@ export type TUserProfile = {
     count: number
     edges: Array<{ node: { username: string } }>
   }
+  is_joined_recently?: boolean
 }

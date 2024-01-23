@@ -53,7 +53,8 @@ export async function getUserProfile(
     is_professional_account: user["is_professional_account"],
     is_private: user["is_private"],
     is_verified: user["is_verified"],
-    edge_mutual_followed_by: user["edge_mutual_followed_by"]
+    edge_mutual_followed_by: user["edge_mutual_followed_by"],
+    is_joined_recently: user["is_joined_recently"]
   }
 }
 
