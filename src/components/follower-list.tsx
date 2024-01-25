@@ -1,19 +1,21 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo } from "react"
 import { useAppDispatch, useAppSelector } from "src/store"
 
-import { getFollowerList } from "~api"
-import { ListButton, ListItem, StatusBar } from "~components/list-items"
+import { getFollowList } from "~api"
+import { Button, ButtonText } from "~components/cbutton"
+import { ListItem, StatusBar } from "~components/list-items"
 import { Loading } from "~components/loading"
 import { findFollowedUsers, findUnFollowedUsers, ListItemMap } from "~helpers"
 import { updateUserIndexedDB } from "~indexedDB"
 import { setFollowers, setUser, type TUserState } from "~store/userSlice"
 import type { TFollowed } from "~types"
 
-import ListIcon from "../appassets/followers.png"
+
+
+
 
 export function FollowerList() {
   const dispatch = useAppDispatch()
-  const [activeFollowList, setActiveFollowList] = useState(false)
   const user: TUserState = useAppSelector((state) => state.user)
 
   const maxId = useMemo(() => {
@@ -37,20 +39,32 @@ export function FollowerList() {
 
   function init() {
     setTimeout(() => {
-      getFollowerList(maxId).then((data) => {
-        dispatch(
-          setFollowers({
-            status_execute: "running",
-            ...data,
-            users: [...user.followers.users, ...data["users"]]
-          })
-        )
+      getFollowList({ maxId, type: "followers" }).then((data) => {
+        if (typeof data === "number") {
+          /*
+           * add 404 429 status code
+           */
+          dispatch(
+            setFollowers({
+              status_execute: "finished"
+            })
+          )
+        } else {
+          dispatch(
+            setFollowers({
+              status_execute: "running",
+              ...data,
+              users: [...user.followers.users, ...data["users"]]
+            })
+          )
+        }
       })
     }, 5000)
   }
 
   useEffect(() => {
-    if (activeFollowList && statusExecute === "idle") {
+    console.log("Followers useEffect started")
+    if (statusExecute === "idle") {
       init()
     } else if (maxId && statusExecute === "running") {
       init()
@@ -82,98 +96,71 @@ export function FollowerList() {
         }
       })
     }
-  }, [activeFollowList, statusExecute, maxId])
+  }, [statusExecute, maxId])
+
+  function refreshFollowes() {
+    dispatch(
+      setFollowers({
+        status_execute: "idle",
+        users: []
+      })
+    )
+  }
+
+  function clearLogList() {
+    dispatch(
+      setFollowers({
+        unfollowed: [],
+        followed: []
+      })
+    )
+    updateUserIndexedDB({
+      ...user,
+      followers: {
+        ...user.followers,
+        unfollowed: [],
+        followed: []
+      }
+    })
+  }
 
   return (
-    <div className="border-2 border-amber-600 inline-block">
-      <div>
-        <button
-          onClick={() => setActiveFollowList(!activeFollowList)}
-          className={activeFollowList ? "flex flex-row" : "flex flex-col"}>
-          <div>
-            <img
-              src={`${ListIcon}`}
-              className="w-10 h-10 mx-auto"
-              alt="followers"
-            />
-            <span>Takipçiler</span>
-          </div>
-          <StatusBar
-            activeFollowList={activeFollowList}
-            statusExecute={statusExecute}
-            count={users.length}
-          />
-        </button>
-      </div>
-      {activeFollowList ? (
-        <div>
-          <div className="flex flex-nowrap">
-            <div className="w-72">
-              {ListButton(
-                {
-                  onClick: () => {
-                    dispatch(
-                      setFollowers({
-                        status_execute: "idle",
-                        users: []
-                      })
-                    )
-                  }
-                },
-                "Yenile"
-              )}
-              <div className="max-h-[500px] overflow-y-scroll">
-                {ListItemMap(users).map((item) => (
-                  <ListItem {...item} key={`${item.user.pk}-follower`} />
-                ))}
-                {statusExecute === "running" || !users.length ? (
-                  <div className="h-4">
-                    <Loading />
-                  </div>
-                ) : null}
+    <div className="bg-light">
+      <StatusBar statusExecute={statusExecute} count={users.length} />
+      <div className="flex flex-row">
+        <div className="basis-1/2">
+          <Button className="px-1.5" onClick={() => refreshFollowes()}>
+            <ButtonText text="Yenile" />
+          </Button>
+          <div className="max-h-[700px] overflow-y-auto space-y-1">
+            {ListItemMap(users).map((item) => (
+              <ListItem {...item} key={`${item.user.pk}-follower`} />
+            ))}
+            {statusExecute === "running" && (
+              <div className="m-2">
+                <Loading imgClass="h-10" animation />
               </div>
-            </div>
-            <div className="w-72">
-              {ListButton(
-                {
-                  onClick: () => {
-                    dispatch(
-                      setFollowers({
-                        unfollowed: [],
-                        followed: []
-                      })
-                    )
-                    updateUserIndexedDB({
-                      ...user,
-                      followers: {
-                        ...user.followers,
-                        unfollowed: [],
-                        followed: []
-                      }
-                    })
-                  }
-                },
-                "Listeyi Temizle"
-              )}
-              <div className="max-h-[500px] overflow-y-scroll">
-                {ListItemMap(
-                  [...unFollowed, ...followed].sort((a, b) => {
-                    return (
-                      new Date(b.created_at).getTime() -
-                      new Date(a.created_at).getTime()
-                    )
-                  })
-                ).map((item, index) => (
-                  <ListItem
-                    {...item}
-                    key={`${item.user.pk}-follower-${index}`}
-                  />
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         </div>
-      ) : null}
+        <div className="basis-1/2">
+          <Button className="px-1.5" onClick={() => clearLogList}>
+            <ButtonText text="Tümünü Sil" />
+          </Button>
+          <div className="max-h-[700px] overflow-y-auto space-y-1">
+            {ListItemMap(
+              [...unFollowed, ...followed].sort((a, b) => {
+                return (
+                  new Date(b.created_at).getTime() -
+                  new Date(a.created_at).getTime()
+                )
+              })
+            ).map((item, index) => (
+              <ListItem {...item} key={`${item.user.pk}-follower-${index}`} />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -8,6 +8,20 @@ import { getAllCookies } from "~helpers"
 
 
 
+type TRequestUrl = {
+  maxId?: string
+  type: "followers" | "following"
+  ds_user_id: string
+}
+
+const requestUrl = ({ maxId, type, ds_user_id }: TRequestUrl): string => {
+  const count = type === "followers" ? 23 : 50
+  if (maxId)
+    return `https://www.instagram.com/api/v1/friendships/${ds_user_id}/${type}/?count=${count}&max_id=${maxId}`
+  else
+    return `https://www.instagram.com/api/v1/friendships/${ds_user_id}/${type}/?count=${count}`
+}
+
 async function urlToBase64(url: string): Promise<string> {
   const response = await fetch(url)
   const blob = await response.blob()
@@ -20,13 +34,14 @@ async function urlToBase64(url: string): Promise<string> {
   })
 }
 
-export async function getFollowerList(
-  maxId: string
-): Promise<Partial<TFollowersList> | HttpStatusCode> {
-  const cookies = getAllCookies()
+export async function getFollowList({
+  maxId,
+  type
+}: Partial<TRequestUrl>): Promise<Partial<TFollowersList> | HttpStatusCode> {
+  const { csrftoken, ds_user_id } = getAllCookies()
   let headers = new Headers()
 
-  headers.append("x-csrftoken", cookies?.csrftoken)
+  headers.append("x-csrftoken", csrftoken)
   headers.append("x-ig-app-id", config.requestHeaders["x-ig-app-id"])
 
   const requestOptions = {
@@ -34,17 +49,10 @@ export async function getFollowerList(
     headers: headers
   }
 
-  let url: string = ""
-  if (maxId)
-    url = `https://www.instagram.com/api/v1/friendships/${
-      cookies.ds_user_id
-    }/followers/?count=${23}&max_id=${maxId}`
-  else
-    url = `https://www.instagram.com/api/v1/friendships/${
-      cookies.ds_user_id
-    }/followers/?count=${23}`
-
-  const response = await fetch(url, requestOptions)
+  const response = await fetch(
+    requestUrl({ maxId, type, ds_user_id }),
+    requestOptions
+  )
     .then((response) => {
       if (response.status !== HttpStatusCode.OK_200) return response.status
 
@@ -54,7 +62,7 @@ export async function getFollowerList(
 
   const { next_max_id, users }: Partial<TFollowersList> = await response
 
-  const usersBase64Images = await Promise.all(
+  const usersWithBase64Images = await Promise.all(
     users.map(async (item) => {
       const imageUrl = item.profile_pic_url
 
@@ -68,43 +76,6 @@ export async function getFollowerList(
 
   return {
     next_max_id,
-    users: usersBase64Images
-  }
-}
-
-export async function getFollowingList(
-  maxId: string
-): Promise<TFollowersList | {}> {
-  const cookies = getAllCookies()
-  let headers = new Headers()
-
-  headers.append("x-csrftoken", cookies?.csrftoken)
-  headers.append("x-ig-app-id", config.requestHeaders["x-ig-app-id"])
-
-  const requestOptions = {
-    method: "GET",
-    headers: headers
-  }
-
-  let url: string = ""
-  if (maxId)
-    url = `https://www.instagram.com/api/v1/friendships/${
-      cookies.ds_user_id
-    }/following/?count=${50}&max_id=${maxId}`
-  else
-    url = `https://www.instagram.com/api/v1/friendships/${
-      cookies.ds_user_id
-    }/following/?count=${50}`
-
-  const response = await fetch(url, requestOptions)
-    .then((response) => response.json())
-    .then((result) => result)
-    .catch((error) => console.log("error", error))
-
-  const { next_max_id, users }: Partial<TFollowersList> = await response
-
-  return {
-    next_max_id: next_max_id,
-    users: users
+    users: usersWithBase64Images
   }
 }

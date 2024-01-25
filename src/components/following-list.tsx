@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useAppDispatch, useAppSelector } from "src/store"
 
-import { getFollowingList } from "~api"
+import { getFollowList } from "~api"
 import { ListButton, ListItem, StatusBar } from "~components/list-items"
 import { Loading } from "~components/loading"
 import { findFollowedUsers, findUnFollowedUsers, ListItemMap } from "~helpers"
@@ -37,14 +37,25 @@ export function FollowingList() {
 
   function init() {
     setTimeout(() => {
-      getFollowingList(maxId).then((data) => {
-        dispatch(
-          setFollowing({
-            status_execute: "running",
-            ...data,
-            users: [...user.following.users, ...data["users"]]
-          })
-        )
+      getFollowList({ maxId, type: "following" }).then((data) => {
+        if (typeof data === "number") {
+          /*
+           * add 404 429 status code
+           */
+          dispatch(
+            setFollowing({
+              status_execute: "finished"
+            })
+          )
+        } else {
+          dispatch(
+            setFollowing({
+              status_execute: "running",
+              ...data,
+              users: [...user.following.users, ...data["users"]]
+            })
+          )
+        }
       })
     }, 5000)
   }
