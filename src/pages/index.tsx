@@ -28,7 +28,7 @@ function MainLayout() {
   const [isLogin, setIsLogin] = useState(false)
   const Base = ({ children }) => {
     return (
-      <div className="flex bg-charcoal text-white w-screen min-h-screen overflow-auto">
+      <div className="flex bg-charcoal text-white w-screen min-h-screen overscroll-y-auto overscroll-x-hidden">
         <div className="container mx-auto">{children}</div>
       </div>
     )
