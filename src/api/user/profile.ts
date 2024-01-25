@@ -10,7 +10,7 @@ import { getAllCookies } from "~helpers"
 
 export async function getUserProfile(
   username: string
-): Promise<TUserProfile | number> {
+): Promise<TUserProfile | HttpStatusCode> {
   const cookies = getAllCookies()
   let headers = new Headers()
 
