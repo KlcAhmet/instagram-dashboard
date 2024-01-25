@@ -102,6 +102,7 @@ function UserList({ loginUser, ...props }) {
   useEffect(() => {
     getUsersIndexedDB().then((result) => {
       setUsersIndexedDB(result)
+      //loginUser(result[0])
       setLoading(false)
     })
   }, [])
