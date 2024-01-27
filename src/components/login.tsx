@@ -124,7 +124,7 @@ function UserList({ loginUser, ...props }) {
 
   return (
     <div className={props.className}>
-      {usersIndexedDB.map((user) => (
+      {usersIndexedDB.map((user: TUserState) => (
         <button
           key={user.id}
           type="button"
