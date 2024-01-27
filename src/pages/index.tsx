@@ -1,17 +1,10 @@
+import { useState } from "react"
 import { Provider } from "react-redux"
 import { store, useAppSelector } from "src/store"
-
-import "~indexedDB"
-
-import { useState } from "react"
 
 import { Loading, LoadingInfoText } from "~components/loading"
 import { Login } from "~components/login"
 import { Profile } from "~components/profile"
-
-
-
-
 
 function IndexPage() {
   return (

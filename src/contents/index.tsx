@@ -3,6 +3,7 @@ import type { PlasmoCSConfig, PlasmoGetStyle } from "plasmo"
 
 import IndexPage from "~pages/index"
 
+import "~indexedDB"
 import "~background"
 
 
