@@ -9,6 +9,7 @@ let openRequest = window.indexedDB.open(dbName, dbVersion)
 openRequest.onsuccess = () => {
   const db = openRequest.result
   console.log("DB Opened", openRequest.result)
+
   if (db.objectStoreNames.length !== 0) store.dispatch(setConnected(true))
 }
 
@@ -18,7 +19,6 @@ openRequest.onupgradeneeded = () => {
   if (db.objectStoreNames.length === 0) {
     db.createObjectStore(dbName, { keyPath: "ds_user_id" })
   }
-  store.dispatch(setConnected(true))
 }
 
 openRequest.onerror = () => {
