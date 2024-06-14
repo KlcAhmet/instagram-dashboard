@@ -8,20 +8,6 @@ import { getAllCookies } from "~helpers"
 
 
 
-type TRequestUrl = {
-  maxId?: string
-  type: "followers" | "following"
-  ds_user_id: string
-}
-
-const requestUrl = ({ maxId, type, ds_user_id }: TRequestUrl): string => {
-  const count = type === "followers" ? 23 : 50
-  if (maxId)
-    return `https://www.instagram.com/api/v1/friendships/${ds_user_id}/${type}/?count=${count}&max_id=${maxId}`
-  else
-    return `https://www.instagram.com/api/v1/friendships/${ds_user_id}/${type}/?count=${count}`
-}
-
 async function urlToBase64(url: string): Promise<string> {
   const response = await fetch(url)
   const blob = await response.blob()
@@ -34,10 +20,26 @@ async function urlToBase64(url: string): Promise<string> {
   })
 }
 
+type TRequestUrl = {
+  next_max_id?: string
+  type: "followers" | "following"
+  ds_user_id: string
+}
+
+const requestUrl = ({ next_max_id, type, ds_user_id }: TRequestUrl): string => {
+  const count = type === "followers" ? 23 : 50
+  if (next_max_id)
+    return `https://www.instagram.com/api/v1/friendships/${ds_user_id}/${type}/?count=${count}&max_id=${next_max_id}`
+  else
+    return `https://www.instagram.com/api/v1/friendships/${ds_user_id}/${type}/?count=${count}`
+}
+
 export async function getFollowList({
-  maxId,
+  next_max_id,
   type
-}: Partial<TRequestUrl>): Promise<Partial<TFollowersList> | HttpStatusCode> {
+}: Partial<TRequestUrl>): Promise<
+  Pick<TFollowersList, "next_max_id" | "users"> | HttpStatusCode
+> {
   const { csrftoken, ds_user_id } = getAllCookies()
   let headers = new Headers()
 
@@ -50,7 +52,7 @@ export async function getFollowList({
   }
 
   const response = await fetch(
-    requestUrl({ maxId, type, ds_user_id }),
+    requestUrl({ next_max_id, type, ds_user_id }),
     requestOptions
   )
     .then((response) => {
@@ -60,13 +62,17 @@ export async function getFollowList({
     })
     .catch((error) => console.log("error", error))
 
-  const { next_max_id, users }: Partial<TFollowersList> = await response
+  const data: Awaited<
+    Pick<TFollowersList, "next_max_id" | "users"> | HttpStatusCode
+  > = await response
+
+  if (typeof data === "number") return data
 
   const usersWithBase64Images = await Promise.all(
-    users.map(async (item) => {
-      const imageUrl = item.profile_pic_url
-
-      const base64ImgSrc = await urlToBase64(imageUrl)
+    data.users.map(async (item) => {
+      const base64ImgSrc: Awaited<string> = await urlToBase64(
+        item.profile_pic_url
+      )
       return {
         ...item,
         profile_pic_url: base64ImgSrc
@@ -75,7 +81,7 @@ export async function getFollowList({
   )
 
   return {
-    next_max_id,
+    ...data,
     users: usersWithBase64Images
   }
 }

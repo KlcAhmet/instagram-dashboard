@@ -27,6 +27,7 @@ type ButtonProps = {
   loading?: boolean
   disabled?: boolean
   big?: boolean
+  animation?: boolean
 }
 
 export function Button({
@@ -36,6 +37,7 @@ export function Button({
   loading = false,
   disabled = false,
   big = false,
+  animation = false,
   ...attributes
 }: ButtonProps & ButtonHTMLAttributes<HTMLButtonElement>) {
   const getDefaultClass = (): string => {
@@ -74,7 +76,7 @@ export function Button({
 
     return (
       <button className={getDefaultClass()} {...attributes} disabled>
-        <Loading imgClass={loadingIconClass} animation={true} />
+        <Loading imgClass={loadingIconClass} animation={animation} />
       </button>
     )
   }

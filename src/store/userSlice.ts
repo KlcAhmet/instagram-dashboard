@@ -40,17 +40,15 @@ const userSlice = createSlice({
       status_execute: "idle",
       next_max_id: "",
       users: [],
-      last_user_log: { created_at: "", users: [] },
-      unfollowed: [],
-      followed: []
+      last_users_log: [],
+      follow_logs: []
     },
     following: {
       status_execute: "idle",
       next_max_id: "",
       users: [],
-      last_user_log: { created_at: "", users: [] },
-      unfollowed: [],
-      followed: []
+      last_users_log: [],
+      follow_logs: []
     },
     likes: {
       liked_posts: {

@@ -2,6 +2,8 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit"
 import type { TypedUseSelectorHook } from "react-redux"
 import { useDispatch, useSelector } from "react-redux"
 
+import userSlice2 from "~store/userSlice2"
+
 import indexedDbSlice from "./indexedDbSlice"
 import userSlice from "./userSlice"
 
@@ -9,7 +11,8 @@ import userSlice from "./userSlice"
 // Here you can add all your reducers
 const combinedReducers = combineReducers({
   user: userSlice,
-  indexedDb: indexedDbSlice
+  indexedDb: indexedDbSlice,
+  user2: userSlice2
 })
 
 // Until persistReducer is fixed, we need to use this mock store to get the types

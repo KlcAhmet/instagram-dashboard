@@ -46,4 +46,4 @@ keys.json
 .tsbuildinfo
 
 # dumpdata
-/src/dumpdata.json
+/src/dumpdata.ts

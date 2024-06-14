@@ -1,76 +1,37 @@
 import { useEffect, useRef, useState } from "react"
-import { useAppDispatch } from "src/store"
+import { useAppDispatch, useAppSelector } from "src/store"
 
-import { getUserProfile } from "~api"
 import { Button, ButtonText } from "~components/cbutton"
 import { Input, InputError, InputLayout } from "~components/cinput"
 import { Loading, LoadingInfoText } from "~components/loading"
-import { bypassWindowEventForKeys, getAllCookies } from "~helpers"
-import {
-  getUsersIndexedDB,
-  setUserIndexedDB,
-  updateUserIndexedDB
-} from "~indexedDB"
-import { setUser, type TUserState } from "~store/userSlice"
+import { bypassWindowEventForKeys } from "~helpers"
+import { getUsersIndexedDB } from "~indexedDB"
+import { type TUserState } from "~store/userSlice"
+import { fetchUser, setErrorMessage } from "~store/userSlice2"
 import type { TUserProfile } from "~types"
 
 
 
 
 
-export function Login({ isLogin }) {
+export function Login() {
   const dispatch = useAppDispatch()
-  const cookieStore = getAllCookies()
+  const userStatus = useAppSelector((state) => state.user2.status)
+  const errorMessage = useAppSelector((state) => state.user2.error)
   const username = useRef(null)
-  const [loginButtonLoading, setLoginButtonLoading] = useState(false)
-  const [errorMessages, setErrorMessages] = useState(null)
 
-  function loginUser(user?: TUserState) {
-    setLoginButtonLoading(true)
-    getUserProfile(user ? user.username : username.current.value)
-      .then((data: number | TUserProfile) => {
-        if (typeof data === "number") {
-          /*
-           * add 404 429 status code
-           */
-          setErrorMessages(data.toString())
-          setLoginButtonLoading(false)
-        } else if (data.id === cookieStore.ds_user_id) {
-          const userData = {
-            ...user,
-            ...data
-          }
-          if (user) {
-            updateUserIndexedDB(userData).then(() => {
-              dispatch(setUser(userData))
-              isLogin(true)
-            })
-          } else {
-            setUserIndexedDB(userData)
-              .then(() => {
-                dispatch(setUser(userData))
-                isLogin(true)
-              })
-              .catch(() => {
-                setErrorMessages("Bu kullanıcı zaten kayıtlı")
-                setLoginButtonLoading(false)
-              })
-          }
-        } else {
-          setErrorMessages(
-            "İnstagrama giriş yaptığın hesap ile giriş yapmalısın"
-          )
-          setLoginButtonLoading(false)
-        }
+  function loginUser(user?: TUserProfile) {
+    dispatch(
+      fetchUser({
+        username: user ? user.username : username.current.value,
+        currentUser: user
       })
-      .catch(() => {
-        setErrorMessages("Kullanıcı bulunamadı")
-        setLoginButtonLoading(false)
-      })
+    )
   }
 
   function setUsername(key: string) {
     username.current.value += key
+    if (errorMessage) dispatch(setErrorMessage(null))
   }
 
   return (
@@ -84,9 +45,12 @@ export function Login({ isLogin }) {
               placeholder="_"
               onKeyDown={(e) => setUsername(bypassWindowEventForKeys(e.key))}
             />
-            <InputError text={errorMessages} />
+            <InputError text={errorMessage && `${errorMessage}`} />
           </InputLayout>
-          <Button loading={loginButtonLoading} onClick={() => loginUser()} big>
+          <Button
+            loading={userStatus === "loading"}
+            onClick={() => loginUser()}
+            big>
             <ButtonText text="Login" big />
           </Button>
         </div>

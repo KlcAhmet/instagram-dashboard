@@ -1,3 +1,3 @@
 export * from "./cookieManagement"
-export * from "./list-component"
+export * from "./list-filters"
 export * from "./bypassWindow-Event"
